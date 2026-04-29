@@ -1,3 +1,52 @@
-/* You can add global styles to this file, and also import other style files */
+
 
 @use 'tailwindcss';
+@use '@angular/material' as mat;
+@use 'colors' as color;
+
+@use 'components/_toastui-editor';
+
+
+@theme {
+  @each $key, $value in color.$primary {
+    --color-primary-#{$key}: #{$value};
+  }
+
+  @each $key, $value in color.$dark {
+    --color-dark-#{$key}: #{$value};
+  }
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  color-scheme: dark;
+  background-color: var(--color-dark-500);
+  color: var(--color-white);
+  font-weight: 00;
+  height: 100%;
+}
+:root {
+  @each $key, $value in color.$primary {
+    --color-primary-#{$key}: #{$value};
+  }
+
+  @each $key, $value in color.$dark {
+    --color-dark-#{$key}: #{$value};
+  }
+}
+
+a,
+button {
+  @apply transition ease-in-out cursor-pointer;
+}
+
+h1 {
+  @apply text-xl md:text-2xl font-bold tracking-wider;
+}
+h2 {
+  @apply text-lg md:text-xl font-bold tracking-wider;
+}
+p {
+  @apply text-sm md:text-base tracking-wider;
+}
+
