@@ -16,7 +16,7 @@ const ROUTE_LABEL_MAP: Record<string, string> = {
   'index': '首頁設定',
   'about': '關於我',
   'posts': '所有文章',
-  'tags': '文章類別',
+  'tags': '文章標籤',
   'topics': '主題文章',
 };
 
@@ -53,15 +53,13 @@ const ROUTE_VIRTUAL_PARENT: Record<string, BreadcrumbItem> = {
               <i class="fa-solid fa-bars"></i>
             </button>
           }
-          @if (breadcrumbs().length > 0) {
-            <a [routerLink]="'/'" class="hover:text-gray-300"><i class="fa-solid fa-house"></i></a>
-            @for (item of breadcrumbs(); track item.label) {
-              <span class="text-primary-300">/</span>
-              @if (item.url) {
-                <a [routerLink]="item.url" class="hover:text-gray-300 text-sm">{{ item.label }}</a>
-              } @else {
-                <span class="text-sm">{{ item.label }}</span>
-              }
+          <a [routerLink]="'/'" class="hover:text-gray-300"><i class="fa-solid fa-house"></i></a>
+          @for (item of breadcrumbs(); track item.label) {
+            <span class="text-primary-300">/</span>
+            @if (item.url) {
+              <a [routerLink]="item.url" class="hover:text-gray-300 text-sm">{{ item.label }}</a>
+            } @else {
+              <span class="text-sm">{{ item.label }}</span>
             }
           }
         </nav>

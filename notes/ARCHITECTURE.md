@@ -10,7 +10,7 @@
 | 首頁設定 | `/index` | — |
 | 關於我 | `/about` | — |
 | 所有文章 | `/posts` | `admin-posts` |
-| 文章類別 | `/tags` | `admin-tags` |
+| 文章標籤 | `/tags` | `admin-tags` |
 | 主題文章 | `/topics` | `admin-topics` |
 
 ---
@@ -23,7 +23,7 @@
 /about                     關於我
 
 /posts                     所有文章列表（新增 / 編輯透過 Modal 操作）
-/tags                      文章類別列表（新增 / 編輯透過 Modal 操作）
+/tags                      文章標籤列表（新增 / 編輯透過 Modal 操作）
 /topics                    主題列表（新增 / 編輯透過 Modal 操作）
 ```
 
@@ -39,7 +39,7 @@ HOME:   { base: '', url: '',       title: APP_TITLE },  // Dashboard
 INDEX:  { base: 'index', url: 'index', title: '首頁設定' },
 ABOUT:     { base: 'about',     url: 'about',     title: '關於我' },
 POSTS:     { base: 'posts',     url: 'posts',     title: '所有文章' },
-TAGS:      { base: 'tags',      url: 'tags',      title: '文章類別' },
+TAGS:      { base: 'tags',      url: 'tags',      title: '文章標籤' },
 TOPICS:    { base: 'topics',    url: 'topics',    title: '主題文章' },
 ```
 
@@ -98,7 +98,7 @@ src/app/
 │       │   └── posts-modal/
 │       │       └── posts-modal.component.ts
 │       │
-│       ├── tags/                     # 文章類別
+│       ├── tags/                     # 文章標籤
 │       │   ├── tags.component.ts
 │       │   └── tags-modal/
 │       │       └── tags-modal.component.ts
@@ -122,7 +122,7 @@ src/app/
 - 列表頁：搜尋、篩選（類別 / 主題 / 狀態）、分頁
 - Modal：新增 / 編輯共用，`data` 有值 → 編輯，無值 → 新增
 
-### tags（文章類別）
+### tags（文章標籤）
 - 列表頁：類別名稱、文章數量
 - Modal：類別名稱、slug、描述
 

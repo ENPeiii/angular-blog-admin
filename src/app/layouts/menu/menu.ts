@@ -100,7 +100,7 @@ export class Menu {
       icon: 'fa-newspaper',
       children: [
         { label: '所有文章', icon: 'fa-list', url: ROUTES_CONSTANT.POSTS.url },
-        { label: '文章類別', icon: 'fa-tags', url: ROUTES_CONSTANT.TAGS.url },
+        { label: '文章標籤', icon: 'fa-tags', url: ROUTES_CONSTANT.TAGS.url },
         { label: '主題文章', icon: 'fa-book', url: ROUTES_CONSTANT.TOPICS.url },
       ],
     },

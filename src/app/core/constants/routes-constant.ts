@@ -23,8 +23,8 @@ export const ROUTES_CONSTANT: {
   ABOUT: { base: 'about', url: 'about', title: `關於我 - ${APP_TITLE}` },
   /**所有文章 */
   POSTS: { base: 'posts', url: 'posts', title: `所有文章 - ${APP_TITLE}` },
-  /**文章類別 */
-  TAGS: { base: 'tags', url: 'tags', title: `文章類別 - ${APP_TITLE}` },
+  /**文章標籤 */
+  TAGS: { base: 'tags', url: 'tags', title: `文章標籤 - ${APP_TITLE}` },
   /**主題文章 */
   TOPICS: { base: 'topics', url: 'topics', title: `主題文章 - ${APP_TITLE}` },
 };
