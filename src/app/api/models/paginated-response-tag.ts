@@ -4,8 +4,12 @@
 import { Tag } from '../models/tag';
 
 /**
- * 統一 API 回傳格式
+ * 分頁 API 回傳格式
  */
-export interface ApiResponseTagArray {
+export interface PaginatedResponseTag {
   data: Array<Tag>;
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
 }

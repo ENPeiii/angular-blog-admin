@@ -4,8 +4,12 @@
 import { PostModel } from '../models/post-model';
 
 /**
- * 統一 API 回傳格式
+ * 分頁 API 回傳格式
  */
-export interface ApiResponsePostModelArray {
+export interface PaginatedResponsePostModel {
   data: Array<PostModel>;
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
 }

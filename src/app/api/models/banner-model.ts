@@ -45,7 +45,7 @@ export interface BannerModel {
   type: BannerType;
 
   /**
-   * 最後更新時間（UTC），未更新過則為 null
+   * 最後更新時間（UTC）
    */
   updatedAt: string;
 }

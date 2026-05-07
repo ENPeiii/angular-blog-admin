@@ -4,8 +4,12 @@
 import { BannerModel } from '../models/banner-model';
 
 /**
- * 統一 API 回傳格式
+ * 分頁 API 回傳格式
  */
-export interface ApiResponseBannerModelArray {
+export interface PaginatedResponseBannerModel {
   data: Array<BannerModel>;
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
 }

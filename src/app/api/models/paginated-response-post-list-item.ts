@@ -4,8 +4,12 @@
 import { PostListItem } from '../models/post-list-item';
 
 /**
- * 統一 API 回傳格式
+ * 分頁 API 回傳格式
  */
-export interface ApiResponsePostListItemArray {
+export interface PaginatedResponsePostListItem {
   data: Array<PostListItem>;
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
 }

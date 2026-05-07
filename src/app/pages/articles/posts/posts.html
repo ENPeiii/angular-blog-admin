@@ -1,1 +1,148 @@
-<p>posts works!</p>
+<div class="p-6 space-y-4">
+
+  <!-- 頁面標題 + 新增按鈕 -->
+  <div class="flex items-center justify-between">
+    <h1 class="text-xl font-semibold">所有文章</h1>
+    <button type="button" class="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-200">
+      <i class="fa-solid fa-plus"></i>
+      <span>新增文章</span>
+    </button>
+  </div>
+
+  <!-- 搜尋 + 篩選區塊 -->
+  <div class="bg-white rounded-lg shadow-sm p-4 flex flex-col sm:flex-row gap-3">
+    <div class="relative flex-1">
+      <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+      <input
+        type="text"
+        placeholder="搜尋文章標題..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="setSearch($event)"
+        class="w-full pl-9 pr-4 py-2 text-sm text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300"
+      />
+    </div>
+    <div class="flex gap-2 shrink-0">
+      @for (option of statusOptions; track option.value) {
+        <button
+          type="button"
+          (click)="setStatusFilter(option.value)"
+          class="px-3 py-2 text-sm rounded-lg border transition-colors duration-200"
+          [class]="statusFilter() === option.value
+            ? 'bg-primary-500 text-white border-primary-500'
+            : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'"
+        >
+          {{ option.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- 文章列表 -->
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="text-left px-6 py-3 text-gray-500 font-medium">標題</th>
+          <th class="text-left px-6 py-3 text-gray-500 font-medium hidden md:table-cell">標籤</th>
+          <th class="text-left px-6 py-3 text-gray-500 font-medium">
+            <button type="button" (click)="toggleSort('status')" class="flex items-center gap-1 hover:text-gray-700">
+              狀態
+              <i class="fa-solid w-3 text-center" [class]="sortIcon('status')"
+                [class.text-primary-500]="sortField() === 'status'"
+                [class.text-gray-300]="sortField() !== 'status'"></i>
+            </button>
+          </th>
+          <th class="text-left px-6 py-3 text-gray-500 font-medium hidden lg:table-cell">
+            <button type="button" (click)="toggleSort('createdAt')" class="flex items-center gap-1 hover:text-gray-700">
+              建立日期
+              <i class="fa-solid w-3 text-center" [class]="sortIcon('createdAt')"
+                [class.text-primary-500]="sortField() === 'createdAt'"
+                [class.text-gray-300]="sortField() !== 'createdAt'"></i>
+            </button>
+          </th>
+          <th class="text-left px-6 py-3 text-gray-500 font-medium hidden sm:table-cell">
+            <button type="button" (click)="toggleSort('updatedAt')" class="flex items-center gap-1 hover:text-gray-700">
+              更新日期
+              <i class="fa-solid w-3 text-center" [class]="sortIcon('updatedAt')"
+                [class.text-primary-500]="sortField() === 'updatedAt'"
+                [class.text-gray-300]="sortField() !== 'updatedAt'"></i>
+            </button>
+          </th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        @for (post of pagedPosts(); track post.id) {
+          <tr class="hover:bg-gray-50 transition-colors duration-150">
+            <td class="px-6 py-4 font-medium text-gray-800">{{ post.title }}</td>
+            <td class="px-6 py-4 hidden md:table-cell">
+              <div class="flex flex-wrap gap-1">
+                @for (tag of post.tags; track tag) {
+                  <span class="px-2 py-0.5 bg-primary-100 text-primary-600 text-xs rounded-full">{{ tag }}</span>
+                }
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              @if (post.status === 'published') {
+                <span class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                  <i class="fa-solid fa-circle text-[6px]"></i> 已發布
+                </span>
+              } @else {
+                <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
+                  <i class="fa-solid fa-circle text-[6px]"></i> 草稿
+                </span>
+              }
+            </td>
+            <td class="px-6 py-4 text-gray-400 hidden lg:table-cell">{{ post.createdAt }}</td>
+            <td class="px-6 py-4 text-gray-400 hidden sm:table-cell">{{ post.updatedAt }}</td>
+            <td class="px-6 py-4">
+              <div class="flex items-center justify-end gap-3">
+                <button type="button" class="text-gray-400 hover:text-primary-500 transition-colors duration-200">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button type="button" class="text-gray-400 hover:text-red-500 transition-colors duration-200">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="px-6 py-16 text-center text-gray-400">
+              <i class="fa-solid fa-file-circle-xmark text-3xl mb-3 block"></i>
+              <p class="text-sm">找不到符合條件的文章</p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="px-6 py-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
+      <span>共 {{ filteredPosts().length }} 篇文章</span>
+      <div class="flex items-center gap-1">
+        <button
+          type="button"
+          (click)="prevPage()"
+          [disabled]="currentPage() === 1"
+          class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 transition-colors duration-200"
+          [class]="currentPage() === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:border-primary-300 hover:text-primary-500'"
+        >
+          <i class="fa-solid fa-chevron-left text-[10px]"></i>
+          上一頁
+        </button>
+        <span class="px-3 py-1.5 text-gray-500">{{ currentPage() }} / {{ totalPages() }}</span>
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="currentPage() === totalPages()"
+          class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 transition-colors duration-200"
+          [class]="currentPage() === totalPages() ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:border-primary-300 hover:text-primary-500'"
+        >
+          下一頁
+          <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

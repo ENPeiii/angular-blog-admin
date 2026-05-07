@@ -7,14 +7,26 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { ApiResponseBannerModelArray } from '../../models/api-response-banner-model-array';
+import { PaginatedResponseBannerModel } from '../../models/paginated-response-banner-model';
 
 export interface GetBanners$Params {
+
+/**
+ * 頁碼（從 1 開始）
+ */
+  page?: number;
+
+/**
+ * 每頁筆數
+ */
+  pageSize?: number;
 }
 
-export function getBanners(http: HttpClient, rootUrl: string, params?: GetBanners$Params, context?: HttpContext): Observable<StrictHttpResponse<ApiResponseBannerModelArray>> {
+export function getBanners(http: HttpClient, rootUrl: string, params?: GetBanners$Params, context?: HttpContext): Observable<StrictHttpResponse<PaginatedResponseBannerModel>> {
   const rb = new RequestBuilder(rootUrl, getBanners.PATH, 'get');
   if (params) {
+    rb.query('page', params.page, {});
+    rb.query('pageSize', params.pageSize, {});
   }
 
   return http.request(
@@ -22,7 +34,7 @@ export function getBanners(http: HttpClient, rootUrl: string, params?: GetBanner
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<ApiResponseBannerModelArray>;
+      return r as StrictHttpResponse<PaginatedResponseBannerModel>;
     })
   );
 }

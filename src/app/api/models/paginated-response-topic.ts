@@ -4,8 +4,12 @@
 import { Topic } from '../models/topic';
 
 /**
- * 統一 API 回傳格式
+ * 分頁 API 回傳格式
  */
-export interface ApiResponseTopicArray {
+export interface PaginatedResponseTopic {
   data: Array<Topic>;
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
 }

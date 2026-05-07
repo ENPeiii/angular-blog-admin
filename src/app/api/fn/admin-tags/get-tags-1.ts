@@ -7,14 +7,26 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { ApiResponseTagArray } from '../../models/api-response-tag-array';
+import { PaginatedResponseTag } from '../../models/paginated-response-tag';
 
 export interface GetTags_1$Params {
+
+/**
+ * 頁碼（從 1 開始）
+ */
+  page?: number;
+
+/**
+ * 每頁筆數
+ */
+  pageSize?: number;
 }
 
-export function getTags_1(http: HttpClient, rootUrl: string, params?: GetTags_1$Params, context?: HttpContext): Observable<StrictHttpResponse<ApiResponseTagArray>> {
+export function getTags_1(http: HttpClient, rootUrl: string, params?: GetTags_1$Params, context?: HttpContext): Observable<StrictHttpResponse<PaginatedResponseTag>> {
   const rb = new RequestBuilder(rootUrl, getTags_1.PATH, 'get');
   if (params) {
+    rb.query('page', params.page, {});
+    rb.query('pageSize', params.pageSize, {});
   }
 
   return http.request(
@@ -22,7 +34,7 @@ export function getTags_1(http: HttpClient, rootUrl: string, params?: GetTags_1$
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<ApiResponseTagArray>;
+      return r as StrictHttpResponse<PaginatedResponseTag>;
     })
   );
 }

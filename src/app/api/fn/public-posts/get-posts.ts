@@ -7,9 +7,19 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { ApiResponsePostListItemArray } from '../../models/api-response-post-list-item-array';
+import { PaginatedResponsePostListItem } from '../../models/paginated-response-post-list-item';
 
 export interface GetPosts$Params {
+
+/**
+ * 頁碼（從 1 開始）
+ */
+  page?: number;
+
+/**
+ * 每頁筆數
+ */
+  pageSize?: number;
 
 /**
  * 文章分類（tech | life），不傳則取全部
@@ -22,9 +32,11 @@ export interface GetPosts$Params {
   topicId?: string;
 }
 
-export function getPosts(http: HttpClient, rootUrl: string, params?: GetPosts$Params, context?: HttpContext): Observable<StrictHttpResponse<ApiResponsePostListItemArray>> {
+export function getPosts(http: HttpClient, rootUrl: string, params?: GetPosts$Params, context?: HttpContext): Observable<StrictHttpResponse<PaginatedResponsePostListItem>> {
   const rb = new RequestBuilder(rootUrl, getPosts.PATH, 'get');
   if (params) {
+    rb.query('page', params.page, {});
+    rb.query('pageSize', params.pageSize, {});
     rb.query('categories', params.categories, {});
     rb.query('topicId', params.topicId, {});
   }
@@ -34,7 +46,7 @@ export function getPosts(http: HttpClient, rootUrl: string, params?: GetPosts$Pa
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<ApiResponsePostListItemArray>;
+      return r as StrictHttpResponse<PaginatedResponsePostListItem>;
     })
   );
 }
