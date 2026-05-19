@@ -23,6 +23,11 @@ export interface Tag {
   name: string;
 
   /**
+   * 使用此標籤的文章數
+   */
+  postCount: number;
+
+  /**
    * 最後更新時間（UTC），未更新過則為 null
    */
   updatedAt: string;

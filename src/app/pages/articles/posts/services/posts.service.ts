@@ -17,8 +17,8 @@ export class PostsService {
   private http = inject(HttpClient);
   private config = inject(ApiConfiguration);
 
-  getPosts$(page: number, pageSize = 10) {
-    return getPosts_1(this.http, this.config.rootUrl, { page, pageSize }).pipe(
+  getPosts$(page: number, pageSize = 10, tagId?: string) {
+    return getPosts_1(this.http, this.config.rootUrl, { page, pageSize, tagId }).pipe(
       filter(r => r.ok),
       map(r => r.body as PaginatedResponsePostModel),
     );

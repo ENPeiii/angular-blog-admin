@@ -20,6 +20,11 @@ export interface GetTags_1$Params {
  * 每頁筆數
  */
   pageSize?: number;
+
+/**
+ * 依標籤名稱模糊搜尋
+ */
+  search?: string;
 }
 
 export function getTags_1(http: HttpClient, rootUrl: string, params?: GetTags_1$Params, context?: HttpContext): Observable<StrictHttpResponse<PaginatedResponseTag>> {
@@ -27,6 +32,7 @@ export function getTags_1(http: HttpClient, rootUrl: string, params?: GetTags_1$
   if (params) {
     rb.query('page', params.page, {});
     rb.query('pageSize', params.pageSize, {});
+    rb.query('search', params.search, {});
   }
 
   return http.request(

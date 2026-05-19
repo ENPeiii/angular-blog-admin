@@ -20,6 +20,11 @@ export interface GetPosts_1$Params {
  * 每頁筆數
  */
   pageSize?: number;
+
+/**
+ * 依標籤 ID 篩選
+ */
+  tagId?: string;
 }
 
 export function getPosts_1(http: HttpClient, rootUrl: string, params?: GetPosts_1$Params, context?: HttpContext): Observable<StrictHttpResponse<PaginatedResponsePostModel>> {
@@ -27,6 +32,7 @@ export function getPosts_1(http: HttpClient, rootUrl: string, params?: GetPosts_
   if (params) {
     rb.query('page', params.page, {});
     rb.query('pageSize', params.pageSize, {});
+    rb.query('tagId', params.tagId, {});
   }
 
   return http.request(
