@@ -84,15 +84,32 @@
               </div>
             </td>
             <td class="px-6 py-4">
-              @if (post.status === 'published') {
-                <span class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                  <i class="fa-solid fa-circle text-[6px]"></i> 已發布
+              <button
+                type="button"
+                (click)="toggleStatus(post)"
+                [disabled]="togglingIds().has(post.id)"
+                class="flex items-center gap-2 disabled:cursor-not-allowed"
+                [attr.aria-label]="post.status === 'published' ? '下架文章' : '上架文章'"
+              >
+                <span
+                  class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200"
+                  [class]="post.status === 'published' ? 'bg-green-500' : 'bg-gray-300'"
+                >
+                  @if (togglingIds().has(post.id)) {
+                    <span class="absolute inset-0 flex items-center justify-center">
+                      <i class="fa-solid fa-circle-notch fa-spin text-white text-[8px]"></i>
+                    </span>
+                  } @else {
+                    <span
+                      class="inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform duration-200"
+                      [class]="post.status === 'published' ? 'translate-x-5' : 'translate-x-0.5'"
+                    ></span>
+                  }
                 </span>
-              } @else {
-                <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
-                  <i class="fa-solid fa-circle text-[6px]"></i> 草稿
+                <span class="text-xs" [class]="post.status === 'published' ? 'text-green-700' : 'text-gray-400'">
+                  {{ post.status === 'published' ? '已發布' : '草稿' }}
                 </span>
-              }
+              </button>
             </td>
             <td class="px-6 py-4 hidden sm:table-cell">
               @if (post.categories === 'tech') {

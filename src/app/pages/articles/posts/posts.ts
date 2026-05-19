@@ -6,6 +6,7 @@ import { PostsService } from './services/posts.service';
 import { ErrorService } from '../../../core/services/error.service';
 import { PaginatedResponsePostModel } from '../../../api/models/paginated-response-post-model';
 import { PostStatusType } from '../../../api/models/post-status-type';
+import { PostModel } from '../../../api/models/post-model';
 
 type SortField = 'createdAt' | 'updatedAt';
 type SortDirection = 'asc' | 'desc';
@@ -27,6 +28,7 @@ export class Posts {
   sortField = signal<SortField>('updatedAt');
   sortDirection = signal<SortDirection>('desc');
   currentPage = signal(1);
+  togglingIds = signal<Set<string>>(new Set());
 
   postsResource = rxResource<PaginatedResponsePostModel, { page: number }>({
     params: () => ({ page: this.currentPage() }),
@@ -98,6 +100,24 @@ export class Posts {
     this.service.deletePost$(id).subscribe({
       next: () => this.postsResource.reload(),
       error: (err) => this.errorService.report(err, 'deletePost'),
+    });
+  }
+
+  toggleStatus(post: PostModel) {
+    if (this.togglingIds().has(post.id)) return;
+
+    const newStatus: PostStatusType = post.status === 'published' ? 'draft' : 'published';
+    this.togglingIds.update(ids => new Set([...ids, post.id]));
+
+    this.service.updatePostStatus$(post.id, newStatus).subscribe({
+      next: () => {
+        this.postsResource.reload();
+        this.togglingIds.update(ids => { const s = new Set(ids); s.delete(post.id); return s; });
+      },
+      error: (err: unknown) => {
+        this.errorService.report(err, 'toggleStatus');
+        this.togglingIds.update(ids => { const s = new Set(ids); s.delete(post.id); return s; });
+      },
     });
   }
 }

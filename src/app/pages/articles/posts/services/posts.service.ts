@@ -4,7 +4,9 @@ import { filter, map } from 'rxjs/operators';
 import { ApiConfiguration } from '../../../../api/api-configuration';
 import { getPosts_1 } from '../../../../api/fn/admin-posts/get-posts-1';
 import { deletePost } from '../../../../api/fn/admin-posts/delete-post';
+import { updatePost } from '../../../../api/fn/admin-posts/update-post';
 import { PaginatedResponsePostModel } from '../../../../api/models/paginated-response-post-model';
+import { PostStatusType } from '../../../../api/models/post-status-type';
 
 @Injectable({ providedIn: 'root' })
 export class PostsService {
@@ -20,6 +22,12 @@ export class PostsService {
 
   deletePost$(id: string) {
     return deletePost(this.http, this.config.rootUrl, { id }).pipe(
+      filter(r => r.ok)
+    );
+  }
+
+  updatePostStatus$(id: string, status: PostStatusType) {
+    return updatePost(this.http, this.config.rootUrl, { id, body: { status } }).pipe(
       filter(r => r.ok)
     );
   }
