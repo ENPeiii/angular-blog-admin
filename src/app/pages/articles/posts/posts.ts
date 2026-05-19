@@ -10,6 +10,7 @@ import { PaginatedResponsePostModel } from '../../../api/models/paginated-respon
 import { PostStatusType } from '../../../api/models/post-status-type';
 import { PostModel } from '../../../api/models/post-model';
 import { PostsModal } from './posts-modal/posts-modal';
+import { ConfirmModal } from '../../../shared/confirm-modal/confirm-modal';
 
 type SortField = 'createdAt' | 'updatedAt';
 type SortDirection = 'asc' | 'desc';
@@ -115,11 +116,24 @@ export class Posts {
     });
   }
 
-  deletePost(id: string) {
-    this.service.deletePost$(id).subscribe({
-      next: () => this.postsResource.reload(),
-      error: (err) => this.errorService.report(err, 'deletePost'),
-    });
+  deletePost(post: PostModel) {
+    this.dialog
+      .open(ConfirmModal, {
+        width: '400px',
+        data: {
+          title: `刪除文章「${post.title}」`,
+          message: '此操作無法復原，文章將被永久移除。',
+          confirmLabel: '確認刪除',
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmed: boolean) => {
+        if (!confirmed) return;
+        this.service.deletePost$(post.id).subscribe({
+          next: () => this.postsResource.reload(),
+          error: (err) => this.errorService.report(err, '刪除文章失敗'),
+        });
+      });
   }
 
   toggleStatus(post: PostModel) {
