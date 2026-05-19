@@ -18,6 +18,7 @@ import { manageResource } from '../../../core/utilities/resource.utils';
 import { Tag } from '../../../api/models/tag';
 import { TagsModal } from './tags-modal/tags-modal';
 import { TagPostsModal } from './tag-posts-modal/tag-posts-modal';
+import { ConfirmModal } from '../../../shared/confirm-modal/confirm-modal';
 
 @Component({
   selector: 'app-tags',
@@ -87,24 +88,36 @@ export class Tags {
   deleteTag(tag: Tag) {
     if (this.deletingIds().has(tag.id)) return;
 
-    const msg =
+    const message =
       tag.postCount > 0
-        ? `確定要刪除標籤「${tag.name}」嗎？\n此標籤目前有 ${tag.postCount} 篇文章，刪除後標籤將從這些文章移除。`
-        : `確定要刪除標籤「${tag.name}」嗎？`;
+        ? `此標籤目前有 ${tag.postCount} 篇文章，刪除後標籤將從這些文章中移除。`
+        : '此操作無法復原。';
 
-    if (!confirm(msg)) return;
+    this.dialog
+      .open(ConfirmModal, {
+        width: '400px',
+        data: {
+          title: `刪除標籤「${tag.name}」`,
+          message,
+          confirmLabel: '確認刪除',
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmed: boolean) => {
+        if (!confirmed) return;
 
-    this.deletingIds.update(ids => new Set([...ids, tag.id]));
-    this.service.deleteTag$(tag.id).subscribe({
-      next: () => {
-        this.tagsResource.reload();
-        this.deletingIds.update(ids => { const s = new Set(ids); s.delete(tag.id); return s; });
-      },
-      error: (err) => {
-        this.errorService.report(err, '刪除標籤失敗');
-        this.deletingIds.update(ids => { const s = new Set(ids); s.delete(tag.id); return s; });
-      },
-    });
+        this.deletingIds.update(ids => new Set([...ids, tag.id]));
+        this.service.deleteTag$(tag.id).subscribe({
+          next: () => {
+            this.tagsResource.reload();
+            this.deletingIds.update(ids => { const s = new Set(ids); s.delete(tag.id); return s; });
+          },
+          error: (err) => {
+            this.errorService.report(err, '刪除標籤失敗');
+            this.deletingIds.update(ids => { const s = new Set(ids); s.delete(tag.id); return s; });
+          },
+        });
+      });
   }
 
   prevPage() { this.currentPage.update(p => Math.max(1, p - 1)); }
