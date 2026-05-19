@@ -9,7 +9,13 @@
   </div>
 
   <!-- Body -->
-  <div class="px-6 py-5 space-y-5 overflow-y-auto max-h-[75vh]">
+  <div class="px-6 py-5 space-y-5 overflow-y-auto max-h-[75vh] relative">
+
+    @if (isLoadingPost()) {
+      <div class="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
+        <i class="fa-solid fa-circle-notch fa-spin text-primary-500 text-2xl"></i>
+      </div>
+    }
 
     <!-- 文章標題 -->
     <div class="space-y-1.5">
@@ -19,17 +25,80 @@
       </label>
       <input
         type="text"
-        [(ngModel)]="title"
+        [ngModel]="title()"
+        (ngModelChange)="title.set($event)"
         placeholder="請輸入文章標題"
         class="w-full px-3 py-2 text-sm text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 placeholder:text-gray-400"
       />
     </div>
 
+    <!-- 分類 + 狀態 -->
+    <div class="flex gap-6">
+
+      <div class="space-y-1.5">
+        <label class="block text-sm font-medium text-gray-700">分類</label>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            (click)="categories.set('tech')"
+            class="flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border transition-colors duration-200"
+            [class]="categories() === 'tech'
+              ? 'bg-primary-500 text-white border-primary-500'
+              : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'"
+          >
+            <i class="fa-solid fa-microchip text-xs"></i>
+            技術
+          </button>
+          <button
+            type="button"
+            (click)="categories.set('life')"
+            class="flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border transition-colors duration-200"
+            [class]="categories() === 'life'
+              ? 'bg-primary-500 text-white border-primary-500'
+              : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'"
+          >
+            <i class="fa-solid fa-leaf text-xs"></i>
+            生活
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="block text-sm font-medium text-gray-700">發布狀態</label>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            (click)="status.set('draft')"
+            class="px-3 py-2 text-sm rounded-lg border transition-colors duration-200"
+            [class]="status() === 'draft'
+              ? 'bg-primary-500 text-white border-primary-500'
+              : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'"
+          >
+            草稿
+          </button>
+          <button
+            type="button"
+            (click)="status.set('published')"
+            class="px-3 py-2 text-sm rounded-lg border transition-colors duration-200"
+            [class]="status() === 'published'
+              ? 'bg-green-500 text-white border-green-500'
+              : 'bg-white text-gray-600 border-gray-200 hover:border-green-300'"
+          >
+            發布
+          </button>
+        </div>
+      </div>
+
+    </div>
+
     <!-- 標籤 -->
     <div class="space-y-1.5">
       <label class="block text-sm font-medium text-gray-700">標籤</label>
-      <div class="flex flex-wrap gap-2 px-3 py-2 min-h-[42px] border border-gray-200 rounded-lg focus-within:ring-2 focus-within:ring-primary-300 cursor-text" (click)="tagInput.focus()">
-        @for (tag of tags; track tag) {
+      <div
+        class="flex flex-wrap gap-2 px-3 py-2 min-h-[42px] border border-gray-200 rounded-lg focus-within:ring-2 focus-within:ring-primary-300 cursor-text"
+        (click)="tagInput.focus()"
+      >
+        @for (tag of tags(); track tag) {
           <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-primary-100 text-primary-600 text-xs rounded-full">
             {{ tag }}
             <button type="button" (click)="removeTag(tag)" class="hover:text-primary-800 transition-colors duration-150">
@@ -40,10 +109,11 @@
         <input
           #tagInput
           type="text"
-          [(ngModel)]="tagInputValue"
+          [ngModel]="tagInputValue()"
+          (ngModelChange)="tagInputValue.set($event)"
           (keydown.enter)="addTag()"
           (keydown.backspace)="removeLastTagIfEmpty()"
-          placeholder="{{ tags.length === 0 ? '輸入標籤後按 Enter 新增' : '' }}"
+          placeholder="{{ tags().length === 0 ? '輸入標籤後按 Enter 新增' : '' }}"
           class="flex-1 min-w-[120px] text-sm text-gray-900 outline-none placeholder:text-gray-400 bg-transparent"
         />
       </div>
@@ -55,8 +125,8 @@
         內容
         <span class="text-red-500 ml-0.5">*</span>
       </label>
-      <div class="w-full overflow-hidden ">
-        <md-editor height="500px"/>
+      <div class="w-full overflow-hidden">
+        <md-editor height="500px" />
       </div>
     </div>
 
@@ -67,15 +137,20 @@
     <button
       type="button"
       (click)="close()"
-      class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:border-gray-300 hover:text-gray-800 transition-colors duration-200"
+      [disabled]="isSaving()"
+      class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:border-gray-300 hover:text-gray-800 transition-colors duration-200 disabled:opacity-50"
     >
       取消
     </button>
     <button
       type="button"
       (click)="save()"
-      class="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition-colors duration-200"
+      [disabled]="isSaving() || isLoadingPost()"
+      class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
     >
+      @if (isSaving()) {
+        <i class="fa-solid fa-circle-notch fa-spin text-xs"></i>
+      }
       {{ isEdit ? '儲存變更' : '新增文章' }}
     </button>
   </div>

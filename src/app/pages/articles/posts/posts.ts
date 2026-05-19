@@ -108,6 +108,10 @@ export class Posts {
       maxWidth: '1000px',
       maxHeight: '90vh',
       data: { postId },
+    }).afterClosed().subscribe(result => {
+      if (result === 'saved') {
+        this.postsResource.reload();
+      }
     });
   }
 

@@ -26,6 +26,7 @@ export class MdEditor implements OnDestroy {
   height = input<string>('500px');
 
   private http = inject(HttpClient);
+  private _pendingContent: string | null = null;
 
   constructor() {
     // 🚀 關鍵：afterNextRender 保證只在瀏覽器執行
@@ -35,12 +36,14 @@ export class MdEditor implements OnDestroy {
 
       const isNarrow = window.innerWidth < 1024;
 
+      const initialValue = this._pendingContent ?? '';
+      this._pendingContent = null;
       this.editor = new Editor({
         el: this.editorElement.nativeElement,
         height: this.height(),
         initialEditType: 'markdown',
         previewStyle: isNarrow ? 'tab' : 'vertical',
-        initialValue: ``,
+        initialValue,
         plugins: [[codeSyntaxHighlight, { highlighter: Prism }], tableMergedCell],
         
         hooks: {
@@ -70,9 +73,16 @@ export class MdEditor implements OnDestroy {
     }
   }
 
-  // 獲取內容的方法
   getContent(): string {
     return this.editor?.getMarkdown() ?? '';
+  }
+
+  setContent(content: string): void {
+    if (this.editor) {
+      this.editor.setMarkdown(content);
+    } else {
+      this._pendingContent = content;
+    }
   }
 
   /**
