@@ -5,6 +5,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { PostsService } from './services/posts.service';
 import { ErrorService } from '../../../core/services/error.service';
+import { manageResource } from '../../../core/utilities/resource.utils';
 import { PaginatedResponsePostModel } from '../../../api/models/paginated-response-post-model';
 import { PostStatusType } from '../../../api/models/post-status-type';
 import { PostModel } from '../../../api/models/post-model';
@@ -33,15 +34,17 @@ export class Posts {
   currentPage = signal(1);
   togglingIds = signal<Set<string>>(new Set());
 
-  postsResource = rxResource<PaginatedResponsePostModel, { page: number }>({
-    params: () => ({ page: this.currentPage() }),
-    stream: ({ params }) => this.service.getPosts$(params.page, PAGE_SIZE),
-  });
+  postsResource = manageResource(
+    rxResource<PaginatedResponsePostModel, { page: number }>({
+      params: () => ({ page: this.currentPage() }),
+      stream: ({ params }) => this.service.getPosts$(params.page, PAGE_SIZE),
+    }),
+    { errorContext: '載入文章失敗' },
+  );
 
   posts = computed(() => this.postsResource.value()?.data ?? []);
   total = computed(() => this.postsResource.value()?.total ?? 0);
   totalPages = computed(() => this.postsResource.value()?.totalPages ?? 1);
-  isLoading = computed(() => this.postsResource.isLoading());
 
   displayedPosts = computed(() => {
     const query = this.searchQuery().toLowerCase();

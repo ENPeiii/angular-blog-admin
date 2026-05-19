@@ -1,3 +1,12 @@
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+:host {
+  animation: overlay-in 0.15s ease-out forwards;
+}
+
 @keyframes loading-detail {
   0% {
     opacity: 0;
