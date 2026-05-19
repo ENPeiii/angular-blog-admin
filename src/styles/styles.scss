@@ -40,6 +40,12 @@ button {
   @apply transition ease-in-out cursor-pointer;
 }
 
+.error-snackbar {
+  --mdc-snackbar-container-color: #b91c1c;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #fecaca;
+}
+
 h1 {
   @apply text-xl md:text-2xl font-bold tracking-wider;
 }
