@@ -2,11 +2,13 @@ import { Component, signal, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { MatDialog } from '@angular/material/dialog';
 import { PostsService } from './services/posts.service';
 import { ErrorService } from '../../../core/services/error.service';
 import { PaginatedResponsePostModel } from '../../../api/models/paginated-response-post-model';
 import { PostStatusType } from '../../../api/models/post-status-type';
 import { PostModel } from '../../../api/models/post-model';
+import { PostsModal } from './posts-modal/posts-modal';
 
 type SortField = 'createdAt' | 'updatedAt';
 type SortDirection = 'asc' | 'desc';
@@ -22,6 +24,7 @@ const PAGE_SIZE = 10;
 export class Posts {
   private service = inject(PostsService);
   private errorService = inject(ErrorService);
+  private dialog = inject(MatDialog);
 
   searchQuery = signal('');
   statusFilter = signal<PostStatusType | 'all'>('all');
@@ -94,6 +97,15 @@ export class Posts {
 
   nextPage() {
     this.currentPage.update(p => Math.min(this.totalPages(), p + 1));
+  }
+
+  openModal(postId: string | null = null) {
+    this.dialog.open(PostsModal, {
+      width: '90vw',
+      maxWidth: '1000px',
+      maxHeight: '90vh',
+      data: { postId },
+    });
   }
 
   deletePost(id: string) {

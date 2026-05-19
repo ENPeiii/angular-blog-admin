@@ -4,10 +4,12 @@ import { Menu } from './menu/menu';
 import { RouterOutlet } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ErrorService } from '../core/services/error.service';
+import { LayoutConfig } from '../core/services/layout-config';
+import { Loading } from '../shared/loading/loading';
 
 @Component({
   selector: 'app-layout',
-  imports: [Header, Menu, RouterOutlet],
+  imports: [Header, Menu, RouterOutlet,Loading],
   template: `
     <app-header />
     <div class="flex flex-1 overflow-hidden">
@@ -16,6 +18,10 @@ import { ErrorService } from '../core/services/error.service';
         <router-outlet />
       </main>
     </div>
+
+    @if (layoutConfig.loading()) {
+      <loading />
+    }
   `,
   styles: `
   :host{
@@ -28,6 +34,7 @@ import { ErrorService } from '../core/services/error.service';
 export class Layout {
   private snackBar = inject(MatSnackBar);
   private errorService = inject(ErrorService);
+  layoutConfig = inject(LayoutConfig);
 
   constructor() {
     effect(() => {

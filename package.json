@@ -32,7 +32,12 @@
     "@angular/material": "^21.2.8",
     "@angular/platform-browser": "^21.1.0",
     "@angular/router": "^21.1.0",
+    "@toast-ui/editor": "^3.2.2",
+    "@toast-ui/editor-plugin-code-syntax-highlight": "^3.1.0",
+    "@toast-ui/editor-plugin-table-merged-cell": "^3.1.0",
     "ng-openapi-gen": "^1.0.5",
+    "prism-themes": "^1.9.0",
+    "prismjs": "^1.30.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

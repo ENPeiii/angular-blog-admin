@@ -31,7 +31,22 @@
               }
             ],
             "styles": [
-              "src/styles/styles.scss"
+              "src/styles/styles.scss",
+              "node_modules/@toast-ui/editor/dist/toastui-editor.css",
+              "node_modules/@toast-ui/editor/dist/theme/toastui-editor-dark.css",
+              "node_modules/@toast-ui/editor-plugin-code-syntax-highlight/dist/toastui-editor-plugin-code-syntax-highlight.css",
+              "node_modules/prismjs/themes/prism-okaidia.css"
+            ],
+            "allowedCommonJsDependencies": [
+              "@toast-ui/editor",
+              "@toast-ui/editor-plugin-code-syntax-highlight",
+              "@toast-ui/editor-plugin-table-merged-cell",
+              "prismjs",
+              "prosemirror-inputrules",
+              "prosemirror-keymap",
+              "prosemirror-model",
+              "prosemirror-state",
+              "prosemirror-view"
             ]
           },
           "configurations": {
