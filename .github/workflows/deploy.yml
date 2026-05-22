@@ -1,0 +1,35 @@
+name: Build and Deploy to GCP
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build -- --configuration production
+
+      - name: Deploy to GCP VM
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr --delete
+          path: dist/angular-blog-admin/browser/
+          remote_path: /var/www/admin.enpei.com.tw/
+          remote_host: ${{ secrets.GCP_HOST }}
+          remote_user: ${{ secrets.GCP_USERNAME }}
+          remote_key: ${{ secrets.GCP_SSH_KEY }}
