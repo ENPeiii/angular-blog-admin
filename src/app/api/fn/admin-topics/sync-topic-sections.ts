@@ -7,30 +7,32 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { ApiResponseTopicWithSections } from '../../models/api-response-topic-with-sections';
+import { SyncSectionsDto } from '../../models/sync-sections-dto';
 
-export interface GetTopic_1$Params {
+export interface SyncTopicSections$Params {
 
 /**
  * 主題 slug
  */
   id: string;
+      body: SyncSectionsDto;
 }
 
-export function getTopic_1(http: HttpClient, rootUrl: string, params: GetTopic_1$Params, context?: HttpContext): Observable<StrictHttpResponse<ApiResponseTopicWithSections>> {
-  const rb = new RequestBuilder(rootUrl, getTopic_1.PATH, 'get');
+export function syncTopicSections(http: HttpClient, rootUrl: string, params: SyncTopicSections$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  const rb = new RequestBuilder(rootUrl, syncTopicSections.PATH, 'put');
   if (params) {
     rb.path('id', params.id, {});
+    rb.body(params.body, 'application/json');
   }
 
   return http.request(
-    rb.build({ responseType: 'json', accept: 'application/json', context })
+    rb.build({ responseType: 'text', accept: '*/*', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<ApiResponseTopicWithSections>;
+      return r as StrictHttpResponse<void>;
     })
   );
 }
 
-getTopic_1.PATH = '/admin/topics/{id}';
+syncTopicSections.PATH = '/admin/topics/{id}/sections';

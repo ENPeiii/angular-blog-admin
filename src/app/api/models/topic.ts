@@ -28,6 +28,11 @@ export interface Topic {
   name: string;
 
   /**
+   * 此主題下的文章數
+   */
+  postCount: number;
+
+  /**
    * 最後更新時間（UTC）
    */
   updatedAt: string;

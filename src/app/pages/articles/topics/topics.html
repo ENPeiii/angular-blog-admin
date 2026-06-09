@@ -1,1 +1,121 @@
-<p>topics works!</p>
+<div class="p-6 space-y-4">
+
+  <!-- 頁面標題 + 新增按鈕 -->
+  <div class="flex items-center justify-between">
+    <h1 class="text-xl font-semibold">系列主題</h1>
+    <button type="button" (click)="openModal()" class="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-200">
+      <i class="fa-solid fa-plus"></i>
+      <span>新增主題</span>
+    </button>
+  </div>
+
+  <!-- 搜尋 -->
+  <div class="bg-white rounded-lg shadow-sm p-4">
+    <div class="relative">
+      <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+      <input
+        type="text"
+        placeholder="搜尋主題名稱（篩選當頁結果）..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+        class="w-full pl-9 pr-4 py-2 text-sm text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300"
+      />
+    </div>
+  </div>
+
+  <!-- 主題列表 -->
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden relative">
+
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="text-left px-6 py-3 text-gray-500 font-medium">主題名稱</th>
+          <th class="text-left px-6 py-3 text-gray-500 font-medium hidden md:table-cell">主題說明</th>
+          <th class="text-left px-6 py-3 text-gray-500 font-medium">文章數</th>
+          <th class="text-left px-6 py-3 text-gray-500 font-medium hidden sm:table-cell">建立日期</th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        @for (topic of displayedTopics(); track topic.id) {
+          <tr class="hover:bg-gray-50 transition-colors duration-150">
+            <td class="px-6 py-4 font-medium text-gray-800">{{ topic.name }}</td>
+            <td class="px-6 py-4 text-gray-500 hidden md:table-cell max-w-xs">
+              @if (topic.description) {
+                <span class="line-clamp-1">{{ topic.description }}</span>
+              } @else {
+                <span class="text-gray-300">—</span>
+              }
+            </td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-primary-100 text-primary-700 text-xs rounded-full">
+                <i class="fa-solid fa-file-lines text-[8px]"></i>
+                {{ topic.postCount }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-gray-400 hidden sm:table-cell">{{ topic.createdAt | date:'yyyy-MM-dd' }}</td>
+            <td class="px-6 py-4">
+              <div class="flex items-center justify-end gap-3">
+                <button type="button" (click)="openModal(topic.id)" class="text-gray-400 hover:text-primary-500 transition-colors duration-200">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button
+                  type="button"
+                  (click)="deleteTopic(topic)"
+                  [disabled]="deletingIds().has(topic.id)"
+                  class="text-gray-400 hover:text-red-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  @if (deletingIds().has(topic.id)) {
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                  } @else {
+                    <i class="fa-solid fa-trash"></i>
+                  }
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          @if (!topicsResource.isLoading()) {
+            <tr>
+              <td colspan="5" class="px-6 py-16 text-center text-gray-400">
+                <i class="fa-solid fa-layer-group text-3xl mb-3 block"></i>
+                <p class="text-sm">尚未建立任何主題</p>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+
+    <div class="px-6 py-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
+      <span>共 {{ total() }} 個主題</span>
+      @if (totalPages() > 1) {
+        <div class="flex items-center gap-1">
+          <button
+            type="button"
+            (click)="prevPage()"
+            [disabled]="currentPage() === 1"
+            class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 transition-colors duration-200"
+            [class]="currentPage() === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:border-primary-300 hover:text-primary-500'"
+          >
+            <i class="fa-solid fa-chevron-left text-[10px]"></i>
+            上一頁
+          </button>
+          <span class="px-3 py-1.5 text-gray-500">{{ currentPage() }} / {{ totalPages() }}</span>
+          <button
+            type="button"
+            (click)="nextPage()"
+            [disabled]="currentPage() === totalPages()"
+            class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 transition-colors duration-200"
+            [class]="currentPage() === totalPages() ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:border-primary-300 hover:text-primary-500'"
+          >
+            下一頁
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+          </button>
+        </div>
+      }
+    </div>
+
+  </div>
+
+</div>

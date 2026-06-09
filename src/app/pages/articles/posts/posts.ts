@@ -110,9 +110,7 @@ export class Posts {
       maxHeight: '90vh',
       data: { postId },
     }).afterClosed().subscribe(result => {
-      if (result === 'saved') {
-        this.postsResource.reload();
-      }
+      if (result) this.postsResource.reload();
     });
   }
 
