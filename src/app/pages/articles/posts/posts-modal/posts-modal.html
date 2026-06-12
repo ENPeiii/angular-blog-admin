@@ -3,7 +3,7 @@
   <!-- Header -->
   <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
     <h2 class="text-base font-semibold text-gray-800">{{ isEdit ? '編輯文章' : '新增文章' }}</h2>
-    <button type="button" (click)="close()" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+    <button type="button" title="關閉" (click)="close()" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
       <i class="fa-solid fa-xmark text-lg"></i>
     </button>
   </div>
@@ -101,7 +101,7 @@
         @for (tag of tags(); track tag) {
           <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-primary-100 text-primary-600 text-xs rounded-full">
             {{ tag }}
-            <button type="button" (click)="removeTag(tag)" class="hover:text-primary-800 transition-colors duration-150">
+            <button type="button" title="移除標籤" (click)="removeTag(tag)" class="hover:text-primary-800 transition-colors duration-150">
               <i class="fa-solid fa-xmark text-[10px]"></i>
             </button>
           </span>
@@ -123,6 +123,7 @@
     <div class="space-y-1.5">
       <label class="block text-sm font-medium text-gray-700">所屬主題</label>
       <select
+        title="選擇主題"
         [ngModel]="selectedTopicId() ?? ''"
         (ngModelChange)="selectedTopicId.set($event || null)"
         [disabled]="isLoadingTopics()"

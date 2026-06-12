@@ -120,10 +120,10 @@
             <td class="px-6 py-4 text-gray-400 hidden sm:table-cell">{{ post.updatedAt | date:'yyyy-MM-dd' }}</td>
             <td class="px-6 py-4">
               <div class="flex items-center justify-end gap-3">
-                <button type="button" (click)="openModal(post.id)" class="text-gray-400 hover:text-primary-500 transition-colors duration-200">
+                <button type="button" title="編輯文章" (click)="openModal(post.id)" class="text-gray-400 hover:text-primary-500 transition-colors duration-200">
                   <i class="fa-solid fa-pen-to-square"></i>
                 </button>
-                <button type="button" (click)="deletePost(post)" class="text-gray-400 hover:text-red-500 transition-colors duration-200">
+                <button type="button" title="刪除文章" (click)="deletePost(post)" class="text-gray-400 hover:text-red-500 transition-colors duration-200">
                   <i class="fa-solid fa-trash"></i>
                 </button>
               </div>
