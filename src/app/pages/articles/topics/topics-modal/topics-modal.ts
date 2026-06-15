@@ -9,6 +9,7 @@ import { PostsService } from '../../posts/services/posts.service';
 import { PostsModal } from '../../posts/posts-modal/posts-modal';
 import { ErrorService } from '../../../../core/services/error.service';
 import { PostModel } from '../../../../api/models/post-model';
+import { PostStatusType } from '../../../../api/models/post-status-type';
 
 export interface TopicsModalData {
   topicId: string | null;
@@ -17,6 +18,7 @@ export interface TopicsModalData {
 interface LocalPost {
   id: string;
   title: string;
+  status: PostStatusType;
 }
 
 interface LocalSection {
@@ -51,6 +53,7 @@ export class TopicsModal implements OnInit {
   allPosts = signal<PostModel[]>([]);
   activePicker = signal<number | null>(null);
   pickerSearch = signal('');
+  togglingIds = signal<Set<string>>(new Set());
 
   usedPostIds = computed(() =>
     new Set(this.sections().flatMap(s => s.posts.map(p => p.id)))
@@ -73,11 +76,12 @@ export class TopicsModal implements OnInit {
         next: ([topic, postsPage]) => {
           this.name.set(topic.name);
           this.mdEditor()?.setContent(topic.description ?? '');
+          const statusMap = new Map(postsPage.data.map(p => [p.id, p.status]));
           this.sections.set(
             topic.sections.map(s => ({
               id: s.id,
               name: s.name,
-              posts: s.posts.map(p => ({ id: p.id, title: p.title })),
+              posts: s.posts.map(p => ({ id: p.id, title: p.title, status: statusMap.get(p.id) ?? 'draft' })),
             }))
           );
           this.allPosts.set(postsPage.data);
@@ -150,7 +154,7 @@ export class TopicsModal implements OnInit {
       const next = [...secs];
       next[sectionIdx] = {
         ...next[sectionIdx],
-        posts: [...next[sectionIdx].posts, { id: post.id, title: post.title }],
+        posts: [...next[sectionIdx].posts, { id: post.id, title: post.title, status: post.status }],
       };
       return next;
     });
@@ -168,9 +172,10 @@ export class TopicsModal implements OnInit {
       this.sections.update(secs =>
         secs.map(s => ({
           ...s,
-          posts: s.posts.map(p => p.id === updatedPost.id ? { ...p, title: updatedPost.title } : p),
+          posts: s.posts.map(p => p.id === updatedPost.id ? { ...p, title: updatedPost.title, status: updatedPost.status } : p),
         }))
       );
+      this.allPosts.update(all => all.map(p => p.id === updatedPost.id ? updatedPost : p));
     });
   }
 
@@ -204,6 +209,30 @@ export class TopicsModal implements OnInit {
       [posts[postIdx - 1], posts[postIdx]] = [posts[postIdx], posts[postIdx - 1]];
       next[sectionIdx] = { ...next[sectionIdx], posts };
       return next;
+    });
+  }
+
+  toggleStatus(postId: string, currentStatus: PostStatusType): void {
+    if (this.togglingIds().has(postId)) return;
+
+    const newStatus: PostStatusType = currentStatus === 'published' ? 'draft' : 'published';
+    this.togglingIds.update(ids => new Set([...ids, postId]));
+
+    this.postsService.updatePostStatus$(postId, newStatus).subscribe({
+      next: () => {
+        this.sections.update(secs =>
+          secs.map(s => ({
+            ...s,
+            posts: s.posts.map(p => p.id === postId ? { ...p, status: newStatus } : p),
+          }))
+        );
+        this.allPosts.update(all => all.map(p => p.id === postId ? { ...p, status: newStatus } : p));
+        this.togglingIds.update(ids => { const next = new Set(ids); next.delete(postId); return next; });
+      },
+      error: (err) => {
+        this.errorService.report(err, '切換文章狀態失敗');
+        this.togglingIds.update(ids => { const next = new Set(ids); next.delete(postId); return next; });
+      },
     });
   }
 

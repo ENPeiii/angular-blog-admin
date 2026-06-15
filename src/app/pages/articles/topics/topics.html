@@ -89,7 +89,7 @@
 
     <div class="px-6 py-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
       <span>共 {{ total() }} 個主題</span>
-      @if (totalPages() > 1) {
+      @if (total() > 0) {
         <div class="flex items-center gap-1">
           <button
             type="button"
