@@ -6,7 +6,7 @@ import { ErrorService } from '../../core/services/error.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (errorService.hasError()) {
-      <div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full">
+      <div class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full">
         @for (error of errorService.errors(); track $index; let i = $index) {
           <div class="bg-red-700 text-white px-4 py-3 rounded-lg shadow-lg flex items-start gap-3">
             <span class="flex-1 text-sm leading-relaxed">
