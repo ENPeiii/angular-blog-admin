@@ -1,5 +1,5 @@
 export const environment = {
-  apiBaseUrl: '',
+  apiBaseUrl: 'https://api.enpei.com.tw/api',
   algolia: {
     appId: 'V30V8P3XQG',
     apiKey: '1c7ca3ac2555f470e33b5caa7e580bb3',

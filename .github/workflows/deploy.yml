@@ -1,35 +1,73 @@
-name: Build and Deploy to GCP
+name: Deploy Admin to GCP
 
 on:
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["Build and Push Docker Image"]
+    types:
+      - completed
+    branches:
+      - main
 
 jobs:
-  build-and-deploy:
+  deploy-to-gcp:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Checkout repository
+      - name: Check out the code
         uses: actions/checkout@v5
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Copy files to GCP VM
+        uses: appleboy/scp-action@v0.1.7
         with:
-          node-version: '22'
-          cache: 'npm'
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          source: "docker-compose.prod.yml,nginx/admin.enpei.com.tw.conf"
+          target: "~/angular-blog-admin/"
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build -- --configuration production
-
-      - name: Deploy to GCP VM
-        uses: burnett01/rsync-deployments@7.0.1
+      - name: Setup nginx + SSL (first deploy only)
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          switches: -avzr --delete
-          path: dist/angular-blog-admin/browser/
-          remote_path: /var/www/admin.enpei.com.tw/
-          remote_host: ${{ secrets.GCP_HOST }}
-          remote_user: ${{ secrets.GCP_USERNAME }}
-          remote_key: ${{ secrets.GCP_SSH_KEY }}
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          script: |
+            CERT_PATH="/etc/letsencrypt/live/admin.enpei.com.tw/fullchain.pem"
+
+            if [ ! -f "$CERT_PATH" ]; then
+              echo "=== First-time: installing nginx + certbot ==="
+              sudo apt-get update -qq
+              sudo apt-get install -y -qq nginx certbot python3-certbot-nginx
+
+              sudo cp ~/angular-blog-admin/nginx/admin.enpei.com.tw.conf \
+                   /etc/nginx/sites-available/admin.enpei.com.tw
+              sudo ln -sf /etc/nginx/sites-available/admin.enpei.com.tw \
+                          /etc/nginx/sites-enabled/
+              sudo nginx -t && sudo systemctl reload nginx
+
+              sudo certbot --nginx \
+                -d admin.enpei.com.tw \
+                --non-interactive \
+                --agree-tos \
+                -m "${{ secrets.CERTBOT_EMAIL }}" \
+                --redirect
+              echo "=== SSL setup complete ==="
+            else
+              echo "=== SSL already configured, skipping ==="
+            fi
+
+      - name: Deploy Docker container
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          script: |
+            echo "${{ secrets.GH_CR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            docker compose -f ~/angular-blog-admin/docker-compose.prod.yml pull
+
+            docker compose -f ~/angular-blog-admin/docker-compose.prod.yml up -d
+
+            docker image prune -f
