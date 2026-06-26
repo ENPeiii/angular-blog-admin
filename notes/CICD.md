@@ -74,7 +74,7 @@ nginx:alpine image
 ┌──────────────────────────────────┐
 │  Workflow 2: deploy.yml          │
 │                                  │
-│  1. SCP docker-compose.prod.yml  │
+│  1. SCP docker-compose.yml  │
 │     + nginx conf → GCP VM        │
 │  2. SSH: Setup nginx + SSL       │
 │     (idempotent，首次才執行)       │
@@ -145,7 +145,7 @@ server {
 
 ---
 
-### 3. `docker-compose.prod.yml`
+### 3. `docker-compose.yml`
 
 ```yaml
 services:
@@ -245,7 +245,7 @@ jobs:
           host: ${{ secrets.GCP_HOST }}
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.GCP_SSH_KEY }}
-          source: "docker-compose.prod.yml,nginx/admin.enpei.com.tw.conf"
+          source: "docker-compose.yml,nginx/admin.enpei.com.tw.conf"
           target: "~/angular-blog-admin/"
 
       - name: Setup nginx + SSL (first deploy only)
@@ -288,9 +288,9 @@ jobs:
           script: |
             echo "${{ secrets.GH_CR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            docker compose -f ~/angular-blog-admin/docker-compose.prod.yml pull
+            docker compose -f ~/angular-blog-admin/docker-compose.yml pull
 
-            docker compose -f ~/angular-blog-admin/docker-compose.prod.yml up -d
+            docker compose -f ~/angular-blog-admin/docker-compose.yml up -d
 
             docker image prune -f
 ```
@@ -396,7 +396,7 @@ export const environment = {
 front-end/angular-blog-admin/
 ├── Dockerfile                              ← 新增
 ├── nginx.conf                              ← 新增（container 內部 Nginx）
-├── docker-compose.prod.yml                 ← 新增
+├── docker-compose.yml                 ← 新增
 ├── nginx/
 │   └── admin.enpei.com.tw.conf            ← 新增（給 deploy workflow 首次 SSL setup 用）
 └── .github/
@@ -441,7 +441,7 @@ nginx/admin.enpei.com.tw.conf             ← 從靜態 serve 改為 proxy pass
 
 - [ ] 在 `front-end/angular-blog-admin/` 根目錄建立 `Dockerfile`（內容見上方）
 - [ ] 建立 `nginx.conf`（container 內部 SPA routing 設定）
-- [ ] 建立 `docker-compose.prod.yml`（port 4201）
+- [ ] 建立 `docker-compose.yml`（port 4201）
 - [ ] 建立 `nginx/admin.enpei.com.tw.conf`（proxy pass 版本）
 - [ ] 本地測試 Docker build：
   ```bash
@@ -528,7 +528,7 @@ docker ps | grep angular-admin
 若容器未啟動：
 
 ```bash
-docker compose -f ~/angular-blog-admin/docker-compose.prod.yml up -d
+docker compose -f ~/angular-blog-admin/docker-compose.yml up -d
 ```
 
 ### Rollback 到舊版本
@@ -536,7 +536,7 @@ docker compose -f ~/angular-blog-admin/docker-compose.prod.yml up -d
 ```bash
 # 在 GCP VM 上執行
 docker pull ghcr.io/enpeiii/angular-blog-admin:sha-<舊的 commit hash>
-docker compose -f ~/angular-blog-admin/docker-compose.prod.yml up -d \
+docker compose -f ~/angular-blog-admin/docker-compose.yml up -d \
   --no-deps -e IMAGE_TAG=sha-<舊的 commit hash>
 ```
 
