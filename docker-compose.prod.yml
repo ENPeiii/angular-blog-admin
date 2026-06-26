@@ -1,5 +1,6 @@
+name: angular-blog
 services:
-  angular-admin:
+  admin:
     image: ghcr.io/enpeiii/angular-blog-admin:latest
     ports:
       - "127.0.0.1:4201:80"
