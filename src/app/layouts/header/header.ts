@@ -73,13 +73,13 @@ const ROUTE_VIRTUAL_PARENT: Record<string, BreadcrumbItem> = {
           <i class="fa-solid fa-chevron-down text-xs"></i>
         </button>
 
-        <mat-menu #userMenu="matMenu" xPosition="before">
+        <mat-menu #userMenu="matMenu" xPosition="before" class="user-menu-panel">
           <div class="px-4 py-3 min-w-[200px]">
             <p class="text-sm font-semibold text-gray-800">ENPei</p>
             <p class="text-xs text-gray-500 mt-0.5">labibi.lg@gmail.com</p>
           </div>
-          <mat-divider />
-          <button mat-menu-item class="flex items-center gap-2 text-red-500">
+          <hr class="border-gray-200" />
+          <button class="flex items-center gap-2 text-red-500 px-4 py-3 hover:text-red-900 transition-colors duration-200">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span>登出</span>
           </button>

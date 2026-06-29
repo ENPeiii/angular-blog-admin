@@ -1,11 +1,9 @@
-
-
 @use 'tailwindcss';
 @use '@angular/material' as mat;
 @use 'colors' as color;
+@use 'material';
 
 @use 'components/_toastui-editor';
-
 
 @theme {
   @each $key, $value in color.$primary {
@@ -55,4 +53,3 @@ h2 {
 p {
   @apply text-sm md:text-base tracking-wider;
 }
-
