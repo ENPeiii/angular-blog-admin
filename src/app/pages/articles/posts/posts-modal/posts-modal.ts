@@ -6,6 +6,7 @@ import { MdEditor } from '../../../../shared/tui-editor/md-editor/md-editor';
 import { PostsService } from '../services/posts.service';
 import { TopicsService } from '../../topics/services/topics.service';
 import { ErrorService } from '../../../../core/services/error.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { CategoriesType } from '../../../../api/models/categories-type';
 import { PostStatusType } from '../../../../api/models/post-status-type';
 import { Topic } from '../../../../api/models/topic';
@@ -28,6 +29,7 @@ export class PostsModal implements OnInit {
   private service = inject(PostsService);
   private topicsService = inject(TopicsService);
   private errorService = inject(ErrorService);
+  private toastService = inject(ToastService);
 
   isEdit = !!this.data?.postId;
 
@@ -134,6 +136,7 @@ export class PostsModal implements OnInit {
     obs$.subscribe({
       next: (post) => {
         this.isSaving.set(false);
+        this.toastService.success(this.isEdit ? '文章已更新' : '文章已建立');
         this.dialogRef.close(post);
       },
       error: (err) => {

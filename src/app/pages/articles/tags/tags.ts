@@ -14,6 +14,7 @@ import { debounceTime } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { TagsService } from './services/tags.service';
 import { ErrorService } from '../../../core/services/error.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { manageResource } from '../../../core/utilities/resource.utils';
 import { Tag } from '../../../api/models/tag';
 import { TagsModal } from './tags-modal/tags-modal';
@@ -30,6 +31,7 @@ import { ConfirmModal } from '../../../shared/confirm-modal/confirm-modal';
 export class Tags {
   private service = inject(TagsService);
   private errorService = inject(ErrorService);
+  private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
 
   // searchInput 直接綁定 template（即時更新），searchDebounced 才送 API
@@ -111,6 +113,7 @@ export class Tags {
           next: () => {
             this.tagsResource.reload();
             this.deletingIds.update(ids => { const s = new Set(ids); s.delete(tag.id); return s; });
+            this.toastService.success('標籤已刪除');
           },
           error: (err) => {
             this.errorService.report(err, '刪除標籤失敗');

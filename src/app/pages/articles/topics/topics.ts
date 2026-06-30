@@ -5,6 +5,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { TopicsService } from './services/topics.service';
 import { ErrorService } from '../../../core/services/error.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { manageResource } from '../../../core/utilities/resource.utils';
 import { PaginatedResponseTopic } from '../../../api/models/paginated-response-topic';
 import { Topic } from '../../../api/models/topic';
@@ -23,6 +24,7 @@ const PAGE_SIZE = 10;
 export class Topics {
   private service = inject(TopicsService);
   private errorService = inject(ErrorService);
+  private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
 
   searchQuery = signal('');
@@ -75,6 +77,7 @@ export class Topics {
         next: () => {
           this.topicsResource.reload();
           this.deletingIds.update(ids => { const s = new Set(ids); s.delete(topic.id); return s; });
+          this.toastService.success('主題已刪除');
         },
         error: (err) => {
           this.errorService.report(err, '刪除主題失敗');

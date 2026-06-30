@@ -8,6 +8,7 @@ import { TopicsService } from '../services/topics.service';
 import { PostsService } from '../../posts/services/posts.service';
 import { PostsModal } from '../../posts/posts-modal/posts-modal';
 import { ErrorService } from '../../../../core/services/error.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { PostModel } from '../../../../api/models/post-model';
 import { PostStatusType } from '../../../../api/models/post-status-type';
 
@@ -40,6 +41,7 @@ export class TopicsModal implements OnInit {
   private postsService = inject(PostsService);
   private dialog = inject(MatDialog);
   private errorService = inject(ErrorService);
+  private toastService = inject(ToastService);
 
   isEdit = !!this.data?.topicId;
 
@@ -272,6 +274,7 @@ export class TopicsModal implements OnInit {
       ]).subscribe({
         next: () => {
           this.isSaving.set(false);
+          this.toastService.success('主題已更新');
           this.dialogRef.close('saved');
         },
         error: (err) => {
@@ -289,6 +292,7 @@ export class TopicsModal implements OnInit {
       ).subscribe({
         next: () => {
           this.isSaving.set(false);
+          this.toastService.success('主題已建立');
           this.dialogRef.close('saved');
         },
         error: (err) => {

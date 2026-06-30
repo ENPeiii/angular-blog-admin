@@ -4,6 +4,7 @@ import { asyncScheduler, observeOn } from 'rxjs';
 import { MdEditor } from '../../shared/tui-editor/md-editor/md-editor';
 import { AboutService } from './services/about.service';
 import { ErrorService } from '../../core/services/error.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-about',
@@ -15,6 +16,7 @@ import { ErrorService } from '../../core/services/error.service';
 export class About implements OnInit {
   private service = inject(AboutService);
   private errorService = inject(ErrorService);
+  private toastService = inject(ToastService);
 
   isLoading = signal(true);
   isSaving = signal(false);
@@ -43,6 +45,7 @@ export class About implements OnInit {
       next: (about) => {
         this.updatedAt.set(about.updatedAt);
         this.isSaving.set(false);
+        this.toastService.success('儲存成功');
       },
       error: (err) => {
         this.errorService.report(err, '儲存失敗');

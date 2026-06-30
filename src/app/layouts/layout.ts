@@ -5,10 +5,11 @@ import { RouterOutlet } from '@angular/router';
 import { LayoutConfig } from '../core/services/layout-config';
 import { Loading } from '../shared/loading/loading';
 import { AppError } from '../shared/error/error';
+import { AppToast } from '../shared/toast/toast';
 
 @Component({
   selector: 'app-layout',
-  imports: [Header, Menu, RouterOutlet, Loading, AppError],
+  imports: [Header, Menu, RouterOutlet, Loading, AppError, AppToast],
   template: `
     <app-header />
     <div class="flex flex-1 overflow-hidden">
@@ -23,6 +24,7 @@ import { AppError } from '../shared/error/error';
     }
 
     <app-error />
+    <app-toast />
   `,
   styles: `
   :host{

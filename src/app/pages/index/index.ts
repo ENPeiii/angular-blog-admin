@@ -4,6 +4,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { BannerService } from './services/banner.service';
 import { ErrorService } from '../../core/services/error.service';
+import { ToastService } from '../../core/services/toast.service';
 import { manageResource } from '../../core/utilities/resource.utils';
 import { BannerModel } from '../../api/models/banner-model';
 import { BannerModal } from './banner-modal/banner-modal';
@@ -18,6 +19,7 @@ import { ConfirmModal } from '../../shared/confirm-modal/confirm-modal';
 export class Index {
   private service = inject(BannerService);
   private errorService = inject(ErrorService);
+  private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
 
   togglingIds = signal<Set<string>>(new Set());
@@ -49,6 +51,7 @@ export class Index {
       next: () => {
         this.bannersResource.reload();
         this.togglingIds.update(ids => { const s = new Set(ids); s.delete(banner.id); return s; });
+        this.toastService.success(banner.isActive ? 'Banner 已停用' : 'Banner 已啟用');
       },
       error: (err: unknown) => {
         this.errorService.report(err, '切換 Banner 狀態失敗');
@@ -68,7 +71,10 @@ export class Index {
     }).afterClosed().subscribe((confirmed: boolean) => {
       if (!confirmed) return;
       this.service.deleteBanner$(banner.id).subscribe({
-        next: () => this.bannersResource.reload(),
+        next: () => {
+          this.bannersResource.reload();
+          this.toastService.success('Banner 已刪除');
+        },
         error: (err) => this.errorService.report(err, '刪除 Banner 失敗'),
       });
     });

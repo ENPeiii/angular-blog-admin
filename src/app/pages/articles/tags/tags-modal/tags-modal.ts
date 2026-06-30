@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { TagsService } from '../services/tags.service';
 import { ErrorService } from '../../../../core/services/error.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { Tag } from '../../../../api/models/tag';
 
 export interface TagsModalData {
@@ -21,6 +22,7 @@ export class TagsModal {
   data = inject<TagsModalData>(MAT_DIALOG_DATA);
   private service = inject(TagsService);
   private errorService = inject(ErrorService);
+  private toastService = inject(ToastService);
 
   isEdit = !!this.data?.tag;
   isSaving = signal(false);
@@ -39,6 +41,7 @@ export class TagsModal {
     obs$.subscribe({
       next: () => {
         this.isSaving.set(false);
+        this.toastService.success(this.isEdit ? '標籤已更新' : '標籤已建立');
         this.dialogRef.close('saved');
       },
       error: (err) => {

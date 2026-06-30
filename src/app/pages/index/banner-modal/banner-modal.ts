@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MdEditor } from '../../../shared/tui-editor/md-editor/md-editor';
 import { BannerService } from '../services/banner.service';
 import { ErrorService } from '../../../core/services/error.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { BannerType } from '../../../api/models/banner-type';
 
 export interface BannerModalData {
@@ -21,6 +22,7 @@ export class BannerModal implements OnInit {
   data = inject<BannerModalData>(MAT_DIALOG_DATA);
   private service = inject(BannerService);
   private errorService = inject(ErrorService);
+  private toastService = inject(ToastService);
 
   isEdit = !!this.data?.bannerId;
 
@@ -103,6 +105,7 @@ export class BannerModal implements OnInit {
     obs$.subscribe({
       next: (banner) => {
         this.isSaving.set(false);
+        this.toastService.success(this.isEdit ? 'Banner 已更新' : 'Banner 已建立');
         this.dialogRef.close(banner);
       },
       error: (err) => {

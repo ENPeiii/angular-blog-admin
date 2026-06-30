@@ -5,6 +5,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { PostsService } from './services/posts.service';
 import { ErrorService } from '../../../core/services/error.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { manageResource } from '../../../core/utilities/resource.utils';
 import { PaginatedResponsePostModel } from '../../../api/models/paginated-response-post-model';
 import { PostStatusType } from '../../../api/models/post-status-type';
@@ -26,6 +27,7 @@ const PAGE_SIZE = 10;
 export class Posts {
   private service = inject(PostsService);
   private errorService = inject(ErrorService);
+  private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
 
   searchQuery = signal('');
@@ -128,7 +130,10 @@ export class Posts {
       .subscribe((confirmed: boolean) => {
         if (!confirmed) return;
         this.service.deletePost$(post.id).subscribe({
-          next: () => this.postsResource.reload(),
+          next: () => {
+            this.postsResource.reload();
+            this.toastService.success('文章已刪除');
+          },
           error: (err) => this.errorService.report(err, '刪除文章失敗'),
         });
       });
@@ -144,6 +149,7 @@ export class Posts {
       next: () => {
         this.postsResource.reload();
         this.togglingIds.update(ids => { const s = new Set(ids); s.delete(post.id); return s; });
+        this.toastService.success(newStatus === 'published' ? '文章已發布' : '文章已設為草稿');
       },
       error: (err: unknown) => {
         this.errorService.report(err, 'toggleStatus');
