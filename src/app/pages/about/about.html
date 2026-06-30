@@ -1,1 +1,38 @@
-<p>about works!</p>
+<div class="p-6 space-y-4">
+
+  <!-- 頁面標題 + 儲存按鈕 -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-semibold">關於我</h1>
+      @if (updatedAt()) {
+        <p class="text-xs text-gray-400 mt-0.5">上次更新：{{ updatedAt() | date:'yyyy-MM-dd HH:mm' }}</p>
+      }
+    </div>
+    <button
+      type="button"
+      (click)="save()"
+      [disabled]="isSaving() || isLoading()"
+      class="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+    >
+      @if (isSaving()) {
+        <i class="fa-solid fa-circle-notch fa-spin text-xs"></i>
+      } @else {
+        <i class="fa-solid fa-floppy-disk text-xs"></i>
+      }
+      儲存
+    </button>
+  </div>
+
+  <!-- 編輯器 -->
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden relative">
+    @if (isLoading()) {
+      <div class="absolute inset-0 bg-white z-10 flex items-center justify-center">
+        <i class="fa-solid fa-circle-notch fa-spin text-primary-500 text-2xl"></i>
+      </div>
+    }
+    <div class="p-4">
+      <md-editor height="calc(100vh - 220px)" />
+    </div>
+  </div>
+
+</div>
