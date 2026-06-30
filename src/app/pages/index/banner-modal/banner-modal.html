@@ -1,0 +1,166 @@
+<div class="flex flex-col w-full">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+    <h2 class="text-base font-semibold text-gray-800">{{ isEdit ? '編輯 Banner' : '新增 Banner' }}</h2>
+    <button type="button" title="關閉" (click)="close()" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+      <i class="fa-solid fa-xmark text-lg"></i>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="px-6 py-5 space-y-5 overflow-y-auto max-h-[75vh] relative">
+
+    @if (isLoading()) {
+      <div class="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
+        <i class="fa-solid fa-circle-notch fa-spin text-primary-500 text-2xl"></i>
+      </div>
+    }
+
+    <!-- 名稱 -->
+    <div class="space-y-1.5">
+      <label class="block text-sm font-medium text-gray-700">
+        Banner 名稱
+        <span class="text-red-500 ml-0.5">*</span>
+      </label>
+      <input
+        type="text"
+        [ngModel]="title()"
+        (ngModelChange)="title.set($event)"
+        placeholder="請輸入 Banner 名稱"
+        class="w-full px-3 py-2 text-sm text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 placeholder:text-gray-400"
+      />
+    </div>
+
+    <!-- 類型（僅新增時可選） -->
+    @if (!isEdit) {
+      <div class="space-y-1.5">
+        <label class="block text-sm font-medium text-gray-700">類型</label>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            (click)="type.set('img')"
+            class="flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border transition-colors duration-200"
+            [class]="type() === 'img'
+              ? 'bg-primary-500 text-white border-primary-500'
+              : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'"
+          >
+            <i class="fa-solid fa-image text-xs"></i>
+            純圖片
+          </button>
+          <button
+            type="button"
+            (click)="type.set('imgText')"
+            class="flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border transition-colors duration-200"
+            [class]="type() === 'imgText'
+              ? 'bg-primary-500 text-white border-primary-500'
+              : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'"
+          >
+            <i class="fa-solid fa-image text-xs"></i>
+            圖片＋文字
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- 圖片 -->
+    <div class="space-y-1.5">
+      <label class="block text-sm font-medium text-gray-700">
+        圖片
+        <span class="text-red-500 ml-0.5">*</span>
+      </label>
+
+      <!-- 預覽 / 上傳 loading -->
+      @if (isUploading()) {
+        <div class="flex items-center justify-center h-40 rounded-lg border border-dashed border-primary-300 bg-primary-50">
+          <div class="flex flex-col items-center gap-2 text-primary-500">
+            <i class="fa-solid fa-circle-notch fa-spin text-2xl"></i>
+            <span class="text-xs">圖片上傳中...</span>
+          </div>
+        </div>
+      } @else if (imgUrl().trim()) {
+        <div class="rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+          <img [src]="imgUrl()" [alt]="imgAlt() || 'preview'" class="w-full h-40 object-cover" />
+        </div>
+      }
+
+      <!-- 上傳按鈕 + URL 輸入並排 -->
+      <div class="flex gap-2">
+        <label
+          class="shrink-0 flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:border-primary-300 hover:text-primary-500 transition-colors duration-200 cursor-pointer"
+          [class.opacity-50]="isUploading()"
+          [class.pointer-events-none]="isUploading()"
+        >
+          <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
+          上傳圖片
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            class="hidden"
+            (change)="onFileSelected($event)"
+            [disabled]="isUploading()"
+          />
+        </label>
+
+        <input
+          type="url"
+          [ngModel]="imgUrl()"
+          (ngModelChange)="imgUrl.set($event)"
+          placeholder="或直接貼上圖片網址..."
+          [disabled]="isUploading()"
+          class="flex-1 min-w-0 px-3 py-2 text-sm text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+        />
+      </div>
+    </div>
+
+    <!-- 圖片替代文字 -->
+    <div class="space-y-1.5">
+      <label class="block text-sm font-medium text-gray-700">
+        圖片替代文字 (alt)
+        <span class="text-red-500 ml-0.5">*</span>
+      </label>
+      <input
+        type="text"
+        [ngModel]="imgAlt()"
+        (ngModelChange)="imgAlt.set($event)"
+        placeholder="描述這張圖片的內容"
+        class="w-full px-3 py-2 text-sm text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 placeholder:text-gray-400"
+      />
+    </div>
+
+    <!-- 文字內容（imgText 類型才顯示） -->
+    @if (type() === 'imgText') {
+      <div class="space-y-1.5">
+        <label class="block text-sm font-medium text-gray-700">Banner 文字內容</label>
+        <div class="w-full overflow-hidden">
+          <md-editor height="360px" />
+        </div>
+      </div>
+    }
+
+  </div>
+
+  <!-- Footer -->
+  <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200">
+    <button
+      type="button"
+      (click)="close()"
+      [disabled]="isSaving()"
+      class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:border-gray-300 hover:text-gray-800 transition-colors duration-200 disabled:opacity-50"
+    >
+      取消
+    </button>
+    <button
+      type="button"
+      (click)="save()"
+      [disabled]="isSaving() || isLoading() || !title().trim() || !imgUrl().trim() || !imgAlt().trim()"
+      class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+    >
+      @if (isSaving()) {
+        <i class="fa-solid fa-circle-notch fa-spin text-xs"></i>
+      }
+      {{ isEdit ? '儲存變更' : '新增 Banner' }}
+    </button>
+  </div>
+
+</div>

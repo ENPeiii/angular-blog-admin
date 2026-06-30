@@ -1,1 +1,142 @@
-<p>index works!</p>
+<div class="p-6 space-y-4">
+
+  <!-- 頁面標題 -->
+  <div class="flex items-center justify-between">
+    <h1 class="text-xl font-semibold">首頁設定</h1>
+  </div>
+
+  <!-- Banner 管理區塊 -->
+  <section class="space-y-3">
+
+    <div class="flex items-center justify-between">
+      <h2 class="text-base font-medium text-gray-400">Banner 管理</h2>
+      <button
+        type="button"
+        (click)="openModal()"
+        class="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-200"
+      >
+        <i class="fa-solid fa-plus"></i>
+        <span>新增 Banner</span>
+      </button>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="text-left px-6 py-3 text-gray-500 font-medium">名稱</th>
+            <th class="text-left px-6 py-3 text-gray-500 font-medium hidden sm:table-cell">類型</th>
+            <th class="text-left px-6 py-3 text-gray-500 font-medium hidden md:table-cell">圖片</th>
+            <th class="text-left px-6 py-3 text-gray-500 font-medium">啟用</th>
+            <th class="text-left px-6 py-3 text-gray-500 font-medium hidden md:table-cell">建立日期</th>
+            <th class="px-6 py-3"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+
+          @for (banner of banners(); track banner.id) {
+            <tr class="hover:bg-gray-50 transition-colors duration-150">
+
+              <!-- 名稱 -->
+              <td class="px-6 py-4 font-medium text-gray-800">{{ banner.title }}</td>
+
+              <!-- 類型 -->
+              <td class="px-6 py-4 hidden sm:table-cell">
+                @if (banner.type === 'img') {
+                  <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                    <i class="fa-solid fa-image text-[8px]"></i> 純圖片
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                    <i class="fa-solid fa-image text-[8px]"></i> 圖片＋文字
+                  </span>
+                }
+              </td>
+
+              <!-- 圖片預覽 -->
+              <td class="px-6 py-4 hidden md:table-cell">
+                <img
+                  [src]="banner.imgUrl"
+                  [alt]="banner.imgAlt"
+                  class="h-10 w-20 object-cover rounded border border-gray-200"
+                />
+              </td>
+
+              <!-- 啟用切換 -->
+              <td class="px-6 py-4">
+                <button
+                  type="button"
+                  (click)="toggleActive(banner)"
+                  [disabled]="togglingIds().has(banner.id)"
+                  class="flex items-center gap-2 disabled:cursor-not-allowed"
+                  [attr.aria-label]="banner.isActive ? '停用 Banner' : '啟用 Banner'"
+                >
+                  <span
+                    class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200"
+                    [class]="banner.isActive ? 'bg-green-500' : 'bg-gray-300'"
+                  >
+                    @if (togglingIds().has(banner.id)) {
+                      <span class="absolute inset-0 flex items-center justify-center">
+                        <i class="fa-solid fa-circle-notch fa-spin text-white text-[8px]"></i>
+                      </span>
+                    } @else {
+                      <span
+                        class="inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform duration-200"
+                        [class]="banner.isActive ? 'translate-x-5' : 'translate-x-0.5'"
+                      ></span>
+                    }
+                  </span>
+                  <span class="text-xs" [class]="banner.isActive ? 'text-green-700' : 'text-gray-400'">
+                    {{ banner.isActive ? '啟用中' : '停用' }}
+                  </span>
+                </button>
+              </td>
+
+              <!-- 建立日期 -->
+              <td class="px-6 py-4 text-gray-400 hidden md:table-cell">{{ banner.createdAt | date:'yyyy-MM-dd' }}</td>
+
+              <!-- 操作 -->
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    title="編輯 Banner"
+                    (click)="openModal(banner.id)"
+                    class="text-gray-400 hover:text-primary-500 transition-colors duration-200"
+                  >
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                  <button
+                    type="button"
+                    title="刪除 Banner"
+                    (click)="deleteBanner(banner)"
+                    class="text-gray-400 hover:text-red-500 transition-colors duration-200"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+
+            </tr>
+          } @empty {
+            @if (!bannersResource.isLoading()) {
+              <tr>
+                <td colspan="6" class="px-6 py-16 text-center text-gray-400">
+                  <i class="fa-solid fa-image text-3xl mb-3 block"></i>
+                  <p class="text-sm">尚無 Banner，點擊右上角新增</p>
+                </td>
+              </tr>
+            }
+          }
+
+        </tbody>
+      </table>
+
+      <div class="px-6 py-3 border-t border-gray-100 text-xs text-gray-400">
+        共 {{ banners().length }} 個 Banner
+      </div>
+    </div>
+
+  </section>
+
+</div>
