@@ -1,11 +1,18 @@
 import { Routes } from '@angular/router';
 import { ROUTES_CONSTANT } from './core/constants/routes-constant';
 import { Layout } from './layouts/layout';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
+    path: ROUTES_CONSTANT.LOGIN.base,
+    loadComponent: () => import('./pages/login/login').then(m => m.Login),
+    title: ROUTES_CONSTANT.LOGIN.title,
+  },
+  {
     path: '',
     component: Layout,
+    canActivate: [authGuard],
     children: [
       {
         path: ROUTES_CONSTANT.HOME.base,
@@ -42,7 +49,6 @@ export const routes: Routes = [
           },
         ],
       },
-    ]
+    ],
   },
-
 ];

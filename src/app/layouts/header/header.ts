@@ -1,10 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { filter } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MenuStateService } from '../../core/services/menu-state.service';
+import { AuthService } from '../../core/services/auth.service';
 
 interface BreadcrumbItem {
   label: string;
@@ -68,18 +69,18 @@ const ROUTE_VIRTUAL_PARENT: Record<string, BreadcrumbItem> = {
           [matMenuTriggerFor]="userMenu"
           class="flex items-center gap-2 hover:text-gray-300 transition-colors duration-200"
         >
-          <span class="w-8 h-8 rounded-full bg-primary-300 flex items-center justify-center text-sm font-semibold">E</span>
-          <span class="text-sm hidden sm:block">ENPei</span>
+          <span class="w-8 h-8 rounded-full bg-primary-300 flex items-center justify-center text-sm font-semibold">{{ userInitial() }}</span>
+          <span class="text-sm hidden sm:block">{{ userName() }}</span>
           <i class="fa-solid fa-chevron-down text-xs"></i>
         </button>
 
         <mat-menu #userMenu="matMenu" xPosition="before" class="user-menu-panel">
           <div class="px-4 py-3 min-w-[200px]">
-            <p class="text-sm font-semibold text-gray-800">ENPei</p>
-            <p class="text-xs text-gray-500 mt-0.5">labibi.lg@gmail.com</p>
+            <p class="text-sm font-semibold text-gray-800">{{ userName() }}</p>
+            <p class="text-xs text-gray-500 mt-0.5">{{ userEmail() }}</p>
           </div>
           <hr class="border-gray-200" />
-          <button class="flex items-center gap-2 text-red-500 px-4 py-3 hover:text-red-900 transition-colors duration-200">
+          <button (click)="logout()" class="flex items-center gap-2 text-red-500 px-4 py-3 hover:text-red-900 transition-colors duration-200">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span>登出</span>
           </button>
@@ -92,8 +93,13 @@ const ROUTE_VIRTUAL_PARENT: Record<string, BreadcrumbItem> = {
 })
 export class Header {
   private router = inject(Router);
+  private authService = inject(AuthService);
   menuState = inject(MenuStateService);
   breadcrumbs = signal<BreadcrumbItem[]>([]);
+
+  userName = computed(() => this.authService.getUser()?.name ?? '');
+  userEmail = computed(() => this.authService.getUser()?.email ?? '');
+  userInitial = computed(() => this.userName().charAt(0).toUpperCase() || 'A');
 
   constructor() {
     this.updateBreadcrumbs(this.router.url);
@@ -103,6 +109,11 @@ export class Header {
     ).subscribe(event => {
       this.updateBreadcrumbs((event as NavigationEnd).urlAfterRedirects);
     });
+  }
+
+  logout(): void {
+    this.authService.clearToken();
+    this.router.navigate(['/login']);
   }
 
   private updateBreadcrumbs(url: string) {

@@ -1,0 +1,23 @@
+<div class="min-h-screen flex items-center justify-center">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 w-full max-w-sm flex flex-col items-center gap-6">
+
+    <div class="text-center space-y-1">
+      <h1 class="text-xl font-semibold text-gray-800">後台管理</h1>
+      <p class="text-sm text-primary-500">使用 Google 帳號登入</p>
+    </div>
+
+    @if (error()) {
+      <p class="text-sm text-red-500 text-center bg-red-50 px-4 py-2 rounded-lg w-full">{{ error() }}</p>
+    }
+
+    @if (isLoading()) {
+      <div class="flex items-center gap-2 text-gray-500 text-sm py-2">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <span>登入中...</span>
+      </div>
+    } @else {
+      <div id="google-signin-btn"></div>
+    }
+
+  </div>
+</div>

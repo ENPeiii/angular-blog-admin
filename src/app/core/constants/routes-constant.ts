@@ -9,6 +9,7 @@ export interface IBaseRoute {
 
 export const ROUTES_CONSTANT: {
   HOME: IBaseRoute;
+  LOGIN: IBaseRoute;
   INDEX: IBaseRoute;
   ABOUT: IBaseRoute;
   POSTS: IBaseRoute;
@@ -17,6 +18,8 @@ export const ROUTES_CONSTANT: {
 } = {
   /**後台首頁（Dashboard） */
   HOME: { base: '', url: '', title: `${APP_TITLE}` },
+  /**登入頁 */
+  LOGIN: { base: 'login', url: '/login', title: `登入 - ${APP_TITLE}` },
   /**前台首頁設定 */
   INDEX: { base: 'index', url: 'index', title: `首頁設定 - ${APP_TITLE}` },
   /**關於我 */
