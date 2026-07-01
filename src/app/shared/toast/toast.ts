@@ -8,8 +8,9 @@ import { ToastService } from '../../core/services/toast.service';
     @if (toastService.hasToast()) {
       <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 items-center">
         @for (toast of toastService.toasts(); track toast.id) {
-          <div class="bg-green-600 text-white px-5 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-48">
-            <i class="fa-solid fa-circle-check text-sm"></i>
+          <div class="px-5 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-48 text-white"
+            [class]="toast.type === 'error' ? 'bg-red-500' : 'bg-green-600'">
+            <i class="text-sm" [class]="toast.type === 'error' ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check'"></i>
             <span class="text-sm">{{ toast.message }}</span>
             <button
               (click)="toastService.dismiss(toast.id)"

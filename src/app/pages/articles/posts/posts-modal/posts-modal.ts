@@ -1,15 +1,17 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { asyncScheduler, observeOn } from 'rxjs';
 import { MdEditor } from '../../../../shared/tui-editor/md-editor/md-editor';
 import { PostsService } from '../services/posts.service';
+import { AiService } from '../services/ai.service';
 import { TopicsService } from '../../topics/services/topics.service';
 import { ErrorService } from '../../../../core/services/error.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { CategoriesType } from '../../../../api/models/categories-type';
 import { PostStatusType } from '../../../../api/models/post-status-type';
 import { Topic } from '../../../../api/models/topic';
+import { AiPolishModal } from '../../../../shared/ai-polish-modal/ai-polish-modal';
 
 export interface PostsModalData {
   postId: string | null;
@@ -27,6 +29,8 @@ export class PostsModal implements OnInit {
   dialogRef = inject(MatDialogRef<PostsModal>);
   data = inject<PostsModalData>(MAT_DIALOG_DATA);
   private service = inject(PostsService);
+  private aiService = inject(AiService);
+  private dialog = inject(MatDialog);
   private topicsService = inject(TopicsService);
   private errorService = inject(ErrorService);
   private toastService = inject(ToastService);
@@ -36,6 +40,7 @@ export class PostsModal implements OnInit {
   isLoadingPost = signal(this.isEdit);
   isLoadingTopics = signal(true);
   isSaving = signal(false);
+  isPolishing = signal(false);
 
   title = signal('');
   categories = signal<CategoriesType>('tech');
@@ -105,6 +110,39 @@ export class PostsModal implements OnInit {
     if (this.tagInputValue() === '') {
       this.tags.update(ts => ts.slice(0, -1));
     }
+  }
+
+  polish(): void {
+    const title = this.title().trim();
+    const content = this.mdEditor()?.getContent() ?? '';
+    if (!content.trim()) {
+      this.toastService.error('請先填入文章內容');
+      return;
+    }
+
+    this.isPolishing.set(true);
+    this.aiService.polishContent$(title, content).subscribe({
+      next: (polished) => {
+        this.isPolishing.set(false);
+        this.dialog
+          .open(AiPolishModal, {
+            data: { original: content, polished },
+            maxWidth: '90vw',
+            panelClass: 'ai-polish-dialog',
+          })
+          .afterClosed()
+          .subscribe((accepted: boolean) => {
+            if (accepted) {
+              this.mdEditor()?.setContent(polished);
+              this.toastService.success('已套用 AI 潤飾');
+            }
+          });
+      },
+      error: (err) => {
+        this.errorService.report(err, 'AI 潤飾失敗');
+        this.isPolishing.set(false);
+      },
+    });
   }
 
   save(): void {
