@@ -80,7 +80,7 @@ export class Tags {
 
   openModal(tag: Tag | null = null) {
     this.dialog
-      .open(TagsModal, { width: '420px', data: { tag } })
+      .open(TagsModal, { width: '420px', disableClose: true, data: { tag } })
       .afterClosed()
       .subscribe(result => {
         if (result === 'saved') this.tagsResource.reload();

@@ -37,6 +37,7 @@ export class Index {
     this.dialog.open(BannerModal, {
       width: '560px',
       maxHeight: '90vh',
+      disableClose: true,
       data: { bannerId },
     }).afterClosed().subscribe(result => {
       if (result) this.bannersResource.reload();

@@ -168,6 +168,7 @@ export class TopicsModal implements OnInit {
       width: '90vw',
       maxWidth: '1000px',
       maxHeight: '90vh',
+      disableClose: true,
       data: { postId },
     }).afterClosed().subscribe((updatedPost) => {
       if (!updatedPost) return;
@@ -186,6 +187,7 @@ export class TopicsModal implements OnInit {
       width: '90vw',
       maxWidth: '1000px',
       maxHeight: '90vh',
+      disableClose: true,
       data: { postId: null, defaultTopicId: this.data.topicId },
     }).afterClosed().subscribe((post: PostModel | undefined) => {
       if (!post) return;

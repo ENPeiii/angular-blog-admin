@@ -110,6 +110,7 @@ export class Posts {
       width: '90vw',
       maxWidth: '1000px',
       maxHeight: '90vh',
+      disableClose: true,
       data: { postId },
     }).afterClosed().subscribe(result => {
       if (result) this.postsResource.reload();

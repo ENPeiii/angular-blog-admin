@@ -53,6 +53,7 @@ export class Topics {
       width: '90vw',
       maxWidth: '860px',
       maxHeight: '90vh',
+      disableClose: true,
       data: { topicId },
     }).afterClosed().subscribe(result => {
       if (result === 'saved') this.topicsResource.reload();
