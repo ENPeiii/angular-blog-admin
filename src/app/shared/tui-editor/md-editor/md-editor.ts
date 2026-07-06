@@ -18,6 +18,14 @@ import { ErrorService } from '../../../core/services/error.service';
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const MAX_SIZE = 5 * 1024 * 1024;
 
+const ADMONITION_TYPES = [
+  { type: 'note', label: 'Note', icon: '📝' },
+  { type: 'tip', label: 'Tip', icon: '💡' },
+  { type: 'important', label: 'Important', icon: '❗' },
+  { type: 'warning', label: 'Warning', icon: '⚠️' },
+  { type: 'caution', label: 'Caution', icon: '🔥' },
+] as const;
+
 @Component({
   selector: 'md-editor',
   imports: [],
@@ -41,6 +49,8 @@ export class MdEditor implements OnDestroy {
   height = input<string>('500px');
   uploading = signal(false);
 
+  private _admonitionMenuCleanups: (() => void)[] = [];
+
   private http = inject(HttpClient);
   private apiConfig = inject(ApiConfiguration);
   private errorService = inject(ErrorService);
@@ -61,6 +71,19 @@ export class MdEditor implements OnDestroy {
         previewStyle: isNarrow ? 'tab' : 'vertical',
         initialValue,
         plugins: [[codeSyntaxHighlight, { highlighter: Prism }], tableMergedCell],
+        toolbarItems: [
+          ['heading', 'bold', 'italic', 'strike'],
+          [
+            { name: 'color', tooltip: '文字顏色', el: this.createColorButton() },
+            { name: 'highlight', tooltip: '螢光筆', el: this.createHighlightButton() },
+            { name: 'admonition', tooltip: '插入提示框', el: this.createAdmonitionButton() },
+          ],
+          ['hr', 'quote'],
+          ['task'],
+          ['table', 'image', 'link'],
+          ['code', 'codeblock'],
+          ['scrollSync'],
+        ],
 
         hooks: {
           addImageBlobHook: async (
@@ -88,10 +111,143 @@ export class MdEditor implements OnDestroy {
     });
   }
 
+  private createColorButton(): HTMLElement {
+    const wrapper = document.createElement('span');
+    wrapper.style.position = 'relative';
+    wrapper.style.display = 'inline-flex';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'toastui-editor-toolbar-icons';
+    button.style.backgroundImage = 'none';
+    button.innerHTML = '<i class="fa-solid fa-palette" style="font-size:14px;color:#555;"></i>';
+
+    const colorInput = document.createElement('input');
+    colorInput.type = 'color';
+    colorInput.value = '#ff0000';
+    colorInput.style.position = 'absolute';
+    colorInput.style.width = '1px';
+    colorInput.style.height = '1px';
+    colorInput.style.opacity = '0';
+    colorInput.style.pointerEvents = 'none';
+
+    type EditorPos = ReturnType<Editor['getSelection']>[number];
+    let range: { start: EditorPos; end: EditorPos; text: string } | null = null;
+
+    button.addEventListener('click', () => {
+      const text = this.editor?.getSelectedText() ?? '';
+      if (!text) return;
+      const selection = this.editor?.getSelection();
+      if (!selection) return;
+      range = { start: selection[0], end: selection[1], text };
+      colorInput.click();
+    });
+
+    colorInput.addEventListener('input', () => {
+      if (!range || !this.editor) return;
+      this.editor.replaceSelection(
+        `<span style="color:${colorInput.value}">${range.text}</span>`,
+        range.start,
+        range.end,
+      );
+      range = null;
+    });
+
+    wrapper.append(button, colorInput);
+    return wrapper;
+  }
+
+  private createHighlightButton(): HTMLElement {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'toastui-editor-toolbar-icons';
+    button.style.backgroundImage = 'none';
+    button.innerHTML = '<i class="fa-solid fa-highlighter" style="font-size:14px;color:#555;"></i>';
+
+    button.addEventListener('click', () => {
+      const text = this.editor?.getSelectedText() ?? '';
+      if (!text) return;
+      const match = text.match(/^<mark>([\s\S]*)<\/mark>$/);
+      const replaced = match ? match[1] : `<mark>${text}</mark>`;
+      this.editor?.replaceSelection(replaced);
+    });
+
+    return button;
+  }
+
+  private createAdmonitionButton(): HTMLElement {
+    const wrapper = document.createElement('span');
+    wrapper.style.position = 'relative';
+    wrapper.style.display = 'inline-flex';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'toastui-editor-toolbar-icons';
+    button.style.backgroundImage = 'none';
+    button.innerHTML =
+      '<i class="fa-solid fa-triangle-exclamation" style="font-size:14px;color:#555;"></i>';
+
+    const menu = document.createElement('div');
+    menu.style.display = 'none';
+    menu.style.position = 'absolute';
+    menu.style.top = '100%';
+    menu.style.left = '0';
+    menu.style.zIndex = '100';
+    menu.style.background = '#fff';
+    menu.style.border = '1px solid #e5e7eb';
+    menu.style.borderRadius = '6px';
+    menu.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)';
+    menu.style.padding = '4px';
+    menu.style.minWidth = '140px';
+
+    const closeMenu = () => {
+      menu.style.display = 'none';
+    };
+
+    for (const { type, label, icon } of ADMONITION_TYPES) {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.textContent = `${icon} ${label}`;
+      Object.assign(item.style, {
+        display: 'block',
+        width: '100%',
+        textAlign: 'left',
+        padding: '6px 10px',
+        border: 'none',
+        background: 'none',
+        cursor: 'pointer',
+        fontSize: '13px',
+        borderRadius: '4px',
+      });
+      item.addEventListener('mouseenter', () => (item.style.background = '#f3f4f6'));
+      item.addEventListener('mouseleave', () => (item.style.background = 'none'));
+      item.addEventListener('click', (event) => {
+        event.stopPropagation();
+        closeMenu();
+        if (!this.editor) return;
+        const snippet = `\n\n<div class="markdown-alert markdown-alert-${type}">\n<p class="markdown-alert-title">${icon} ${label}</p>\n<p>在這裡輸入內容</p>\n</div>\n\n`;
+        this.editor.insertText(snippet);
+      });
+      menu.appendChild(item);
+    }
+
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    });
+
+    document.addEventListener('click', closeMenu);
+    this._admonitionMenuCleanups.push(() => document.removeEventListener('click', closeMenu));
+
+    wrapper.append(button, menu);
+    return wrapper;
+  }
+
   ngOnDestroy() {
     if (this.editor) {
       this.editor.destroy();
     }
+    this._admonitionMenuCleanups.forEach((cleanup) => cleanup());
   }
 
   getContent(): string {

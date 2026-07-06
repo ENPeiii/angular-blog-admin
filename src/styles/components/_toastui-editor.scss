@@ -38,5 +38,29 @@ code[class*='language-'] {
   pre{
     padding: 0.5rem !important;
   }
+
+  .markdown-alert {
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    border-left: 4px solid var(--markdown-alert-color, #888);
+    background: var(--markdown-alert-bg, #f6f8fa);
+    border-radius: 4px;
+
+    p {
+      margin: 0.25rem 0;
+      color: #24292f !important;
+    }
+
+    .markdown-alert-title {
+      font-weight: 700;
+      color: var(--markdown-alert-color, #888);
+    }
+  }
+
+  .markdown-alert-note { --markdown-alert-color: #0969da; --markdown-alert-bg: #ddf4ff; }
+  .markdown-alert-tip { --markdown-alert-color: #1a7f37; --markdown-alert-bg: #dafbe1; }
+  .markdown-alert-important { --markdown-alert-color: #8250df; --markdown-alert-bg: #fbefff; }
+  .markdown-alert-warning { --markdown-alert-color: #9a6700; --markdown-alert-bg: #fff8c5; }
+  .markdown-alert-caution { --markdown-alert-color: #cf222e; --markdown-alert-bg: #ffebe9; }
 }
 
