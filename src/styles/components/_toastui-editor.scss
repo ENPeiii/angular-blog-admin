@@ -35,6 +35,15 @@ code[class*='language-'] {
       font-size: 1.25rem !important;
     }
   }
+  h3 {
+    color: var(--color-yellow-500) !important;
+  }
+  h4 {
+    color: var(--color-green-300) !important;
+  }
+  h5 {
+    color: var(--color-blue-300) !important;
+  }
   pre{
     padding: 0.5rem !important;
   }
