@@ -125,7 +125,7 @@
       <select
         title="選擇主題"
         [ngModel]="selectedTopicId() ?? ''"
-        (ngModelChange)="selectedTopicId.set($event || null)"
+        (ngModelChange)="onTopicChange($event || null)"
         [disabled]="isLoadingTopics()"
         class="w-full px-3 py-2 text-sm text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white disabled:text-gray-400 disabled:cursor-not-allowed"
       >
@@ -135,6 +135,25 @@
         }
       </select>
     </div>
+
+    <!-- 所屬章節（選完主題後出現） -->
+    @if (selectedTopicId()) {
+      <div class="space-y-1.5">
+        <label class="block text-sm font-medium text-gray-700">所屬章節</label>
+        <select
+          title="選擇章節"
+          [ngModel]="selectedSectionId() ?? ''"
+          (ngModelChange)="selectedSectionId.set($event || null)"
+          [disabled]="isLoadingSections()"
+          class="w-full px-3 py-2 text-sm text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white disabled:text-gray-400 disabled:cursor-not-allowed"
+        >
+          <option value="">{{ isLoadingSections() ? '載入中...' : '無（不指定章節）' }}</option>
+          @for (section of availableSections(); track section.id) {
+            <option [value]="section.id">{{ section.name }}</option>
+          }
+        </select>
+      </div>
+    }
 
     <!-- 內容 -->
     <div class="space-y-1.5">

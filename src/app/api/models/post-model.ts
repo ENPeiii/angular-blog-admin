@@ -57,6 +57,11 @@ export interface PostModel {
   topicId: string | null;
 
   /**
+   * 所屬章節 ID
+   */
+  topicSectionId: string | null;
+
+  /**
    * 最後更新時間（UTC）
    */
   updatedAt: string;

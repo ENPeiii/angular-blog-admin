@@ -38,4 +38,9 @@ export interface CreatePostDto {
    * 所屬主題 ID
    */
   topicId?: string;
+
+  /**
+   * 所屬章節 ID
+   */
+  topicSectionId?: string;
 }

@@ -38,4 +38,9 @@ export interface UpdatePostDto {
    * 所屬主題 ID（傳 null 可解除關聯）
    */
   topicId?: string | null;
+
+  /**
+   * 所屬章節 ID（傳 null 可解除關聯）
+   */
+  topicSectionId?: string | null;
 }

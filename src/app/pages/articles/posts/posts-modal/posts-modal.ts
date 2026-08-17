@@ -11,6 +11,7 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { CategoriesType } from '../../../../api/models/categories-type';
 import { PostStatusType } from '../../../../api/models/post-status-type';
 import { Topic } from '../../../../api/models/topic';
+import { TopicSection } from '../../../../api/models/topic-section';
 import { AiPolishModal } from '../../../../shared/ai-polish-modal/ai-polish-modal';
 
 export interface PostsModalData {
@@ -50,12 +51,16 @@ export class PostsModal implements OnInit {
   selectedTopicId = signal<string | null>(null);
 
   allTopics = signal<Topic[]>([]);
+  availableSections = signal<TopicSection[]>([]);
+  isLoadingSections = signal(false);
+  selectedSectionId = signal<string | null>(null);
 
   private mdEditor = viewChild(MdEditor);
 
   ngOnInit(): void {
     if (!this.isEdit && this.data.defaultTopicId) {
       this.selectedTopicId.set(this.data.defaultTopicId);
+      this.loadSections(this.data.defaultTopicId);
     }
     this.loadTopics();
     if (this.isEdit && this.data.postId) {
@@ -84,6 +89,10 @@ export class PostsModal implements OnInit {
           this.status.set(post.status);
           this.tags.set(post.tags.map(t => t.name));
           this.selectedTopicId.set(post.topicId);
+          this.selectedSectionId.set(post.topicSectionId);
+          if (post.topicId) {
+            this.loadSections(post.topicId);
+          }
           this.mdEditor()?.setContent(post.content);
           this.isLoadingPost.set(false);
         },
@@ -92,6 +101,27 @@ export class PostsModal implements OnInit {
           this.isLoadingPost.set(false);
         },
       });
+  }
+
+  onTopicChange(topicId: string | null): void {
+    this.selectedTopicId.set(topicId);
+    this.selectedSectionId.set(null);
+    this.loadSections(topicId);
+  }
+
+  private loadSections(topicId: string | null): void {
+    if (!topicId) {
+      this.availableSections.set([]);
+      return;
+    }
+    this.isLoadingSections.set(true);
+    this.topicsService.getTopicWithSections$(topicId).subscribe({
+      next: (topic) => {
+        this.availableSections.set(topic.sections);
+        this.isLoadingSections.set(false);
+      },
+      error: () => this.isLoadingSections.set(false),
+    });
   }
 
   addTag(): void {
@@ -152,6 +182,7 @@ export class PostsModal implements OnInit {
 
     this.isSaving.set(true);
     const topicId = this.selectedTopicId();
+    const topicSectionId = this.selectedSectionId();
 
     const obs$ = this.isEdit
       ? this.service.updatePost$(this.data.postId!, {
@@ -161,6 +192,7 @@ export class PostsModal implements OnInit {
           status: this.status(),
           tags: this.tags(),
           topicId: topicId,
+          topicSectionId: topicSectionId,
         })
       : this.service.createPost$({
           title,
@@ -169,6 +201,7 @@ export class PostsModal implements OnInit {
           status: this.status(),
           tags: this.tags(),
           ...(topicId ? { topicId } : {}),
+          ...(topicSectionId ? { topicSectionId } : {}),
         });
 
     obs$.subscribe({
