@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Header } from './header/header';
 import { Menu } from './menu/menu';
 import { RouterOutlet } from '@angular/router';
@@ -26,6 +26,7 @@ import { AppToast } from '../shared/toast/toast';
     <app-error />
     <app-toast />
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
   :host{
     display: flex;

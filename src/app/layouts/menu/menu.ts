@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ROUTES_CONSTANT } from '../../core/constants/routes-constant';
 import { MenuStateService } from '../../core/services/menu-state.service';
@@ -83,6 +83,7 @@ interface MenuGroup {
       </nav>
     </aside>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: ``,
 })
 export class Menu {

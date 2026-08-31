@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { rxResource } from '@angular/core/rxjs-interop';
@@ -22,6 +22,7 @@ const PAGE_SIZE = 10;
   selector: 'app-posts',
   imports: [FormsModule, DatePipe],
   templateUrl: './posts.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './posts.scss',
 })
 export class Posts {
