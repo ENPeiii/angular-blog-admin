@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { Header } from './header';
+import { AuthService } from '../../core/services/auth.service';
 
 describe('Header', () => {
   let component: Header;
@@ -8,7 +10,11 @@ describe('Header', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Header]
+      imports: [Header],
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: { getUser: () => null, clearToken: () => {} } },
+      ]
     })
     .compileComponents();
 

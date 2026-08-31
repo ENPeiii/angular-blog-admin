@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,6 +14,7 @@ import { ConfirmModal } from '../../shared/confirm-modal/confirm-modal';
   selector: 'app-index',
   imports: [DatePipe],
   templateUrl: './index.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './index.scss',
 })
 export class Index {

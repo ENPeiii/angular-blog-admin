@@ -7,6 +7,7 @@ import {
   OnDestroy,
   signal,
   ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import type Editor from '@toast-ui/editor';
@@ -41,6 +42,7 @@ const ADMONITION_TYPES = [
       </div>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [],
 })
 export class MdEditor implements OnDestroy {
