@@ -33,6 +33,7 @@ jobs:
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.GCP_SSH_KEY }}
           script: |
+            set -e
             CERT_PATH="/etc/letsencrypt/live/admin.enpei.com.tw/fullchain.pem"
 
             if [ ! -f "$CERT_PATH" ]; then
@@ -64,6 +65,7 @@ jobs:
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.GCP_SSH_KEY }}
           script: |
+            set -e
             echo "${{ secrets.GH_CR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             docker compose -f ~/angular-blog-admin/docker-compose.prod.yml pull
